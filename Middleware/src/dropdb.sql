@@ -1,0 +1,15 @@
+DROP TABLE UserHasFollowingList;
+DROP TABLE CommentsHasLikesList;
+DROP TABLE ReviewsHasComments;
+DROP TABLE ReviewsHasLikesList;
+DROP TABLE UserWritesReviews;
+DROP TABLE SetsHasReviews;
+DROP TABLE SetHasFlashcards;
+DROP TABLE SetHasTag;
+DROP TABLE UsersCreatesFolder;
+DROP TABLE Reviews;
+DROP TABLE Flashcards;
+DROP TABLE Tag;
+DROP TABLE Sets;
+DROP TABLE Folder;
+DROP TABLE Users;
