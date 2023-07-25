@@ -19,7 +19,7 @@ public class Server {
 
         // Connect to Database
         String username = "root";
-        String password = "Bb32003211";
+        String password = "";
         Connection connection = DriverManager.getConnection(url, username, password);
 
         // Display Information about the Database
