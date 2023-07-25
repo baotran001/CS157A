@@ -97,7 +97,7 @@ CREATE TABLE ReviewsHasComments(
 );
 
 CREATE TABLE CommentsHasLikesList(
-    cid VARCHAR(15) NOT NULL, 
+    cid INTEGER NOT NULL, 
     uid VARCHAR(15) NOT NULL, 
     PRIMARY KEY (cid, uid),
     FOREIGN KEY (cid) REFERENCES ReviewsHasComments(cid) ON DELETE CASCADE,
