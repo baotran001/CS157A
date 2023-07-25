@@ -51,7 +51,7 @@ CREATE TABLE SetHasFlashcards(
     flashid VARCHAR(15) NOT NULL, 
     PRIMARY KEY (sid, flashid),
     FOREIGN KEY (sid) REFERENCES Sets(sid) ON DELETE CASCADE,
-    FOREIGN KEY (flashid) REFERENCES Flash(flashid) ON DELETE CASCADE
+    FOREIGN KEY (flashid) REFERENCES Flashcards(flashid) ON DELETE CASCADE
 );
 
 CREATE TABLE Reviews(
