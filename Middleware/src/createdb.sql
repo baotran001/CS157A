@@ -93,6 +93,7 @@ CREATE TABLE ReviewsHasComments(
     author VARCHAR(15) NOT NULL,
     text VARCHAR(255) NOT NULL,
     PRIMARY KEY (rid, cid),
+    INDEX idx_cid (cid),
     FOREIGN KEY (rid) REFERENCES Reviews(rid) ON DELETE CASCADE
 );
 
