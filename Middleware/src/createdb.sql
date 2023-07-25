@@ -28,7 +28,7 @@ CREATE TABLE Sets(
 
 CREATE TABLE Tag(
     tid VARCHAR(15) PRIMARY KEY,
-    cat_name VARCHAR(50)
+    tag_name VARCHAR(50)
 );
 
 CREATE TABLE SetHasTag(
