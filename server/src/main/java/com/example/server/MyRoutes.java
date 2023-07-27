@@ -14,4 +14,11 @@ public class MyRoutes {
         model.addAttribute("message", message);
         return "register";
     }
+
+    @GetMapping("/login")
+    public String login(Model model){
+        String message = "Hello from Spring Boot!";
+        model.addAttribute("message", message);
+        return "login";
+    }
 }
