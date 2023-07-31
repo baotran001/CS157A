@@ -1,6 +1,4 @@
 package com.example.server;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,38 +8,10 @@ import java.sql.*;
 @RestController
 @RequestMapping("/quizMeDB")
 public class MyController {
-
-    @GetMapping("/database-info")
-    public String getDatabaseInfo() throws SQLException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            }
-        catch (Exception E) {
-            System.err.println("Unable to load driver.");
-            E.printStackTrace();
-        }
-
-        // Define Connection URL
-        String host = "localhost";
-        String dbName = "quizmedb";
-        int port = 3306;
-        String url = "jdbc:mysql://" + host + ":" +
-        port + "/" + dbName;
-
-        // Connect to Database
-        String username = "root";
-        String password = "Bb32003211";
-        Connection connection = DriverManager.getConnection(url, username, password);
-
-        // Display Information about the Database
-        DatabaseMetaData dbMetaData = connection.getMetaData();
-        String productName =
-        dbMetaData.getDatabaseProductName();
-        System.out.println("Database: " + productName);
-        String productVersion =
-        dbMetaData.getDatabaseProductVersion();
-        System.out.println("Version: " + productVersion);
-
+    @GetMapping("/createFlashCard")
+    public String createFlashCard() throws SQLException{
+        // Establish SQL Connection
+        Connection connection = createSQLConnection();
         // Statement Execution
         try{
             Statement statement = connection.createStatement();
@@ -62,5 +32,30 @@ public class MyController {
         }
 
         return "success";
+    }
+
+    public static Connection createSQLConnection() throws SQLException{
+        // Load Driver
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            }
+        catch (Exception E) {
+            System.err.println("Unable to load driver.");
+            E.printStackTrace();
+        }
+
+        // Define Connection URL
+        String host = "localhost";
+        String dbName = "quizmedb";
+        int port = 3306;
+        String url = "jdbc:mysql://" + host + ":" +
+        port + "/" + dbName;
+
+        // Connect to Database
+        String username = "root";
+        String password = "Bb32003211";
+        Connection connection = DriverManager.getConnection(url, username, password);
+
+        return connection;
     }
 }
