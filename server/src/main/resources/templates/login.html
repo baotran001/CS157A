@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Getting Started: Serving Web Content</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="../static/css/register.css" rel="stylesheet" type="text/css" th:href="@{/css/register.css}" />
+</head>
+<body>
+    <form action="/action_page.php">
+        <div class="container">
+          <h1 id="registerTitle">Login</h1>
+          <p>Enter your account details to login.</p>
+          <hr>
+
+          <label for="username"><b>Username</b></label>
+          <input type="text" placeholder="Enter Username" name="username" id="username" required>
+      
+          <label for="psw"><b>Password</b></label>
+          <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+      
+          <button type="submit" class="registerbtn">Login</button>
+        </div>
+        
+        <div class="container signin">
+          <p>New user? <a href="#">Register</a>.</p>
+        </div>
+      </form>
+</body>
+</html>
