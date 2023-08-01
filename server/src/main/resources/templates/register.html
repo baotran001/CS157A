@@ -16,6 +16,9 @@
         <p th:text="${errorMessage}"></p>
       </div>
 
+      <label><b>Username</b></label>
+      <input type="text" placeholder="Enter Username" th:field="*{username}" required>
+
       <label><b>Email</b></label>
       <input type="text" placeholder="Enter Email" th:field="*{email}" required>
   
