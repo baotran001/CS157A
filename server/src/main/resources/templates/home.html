@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Homepage</title>
+</head>
+<body>
+    <div th:if="${cookieName}">
+        <p>Logged In as <span th:text="${cookieName}"></span></p>
+        <h1>home</h1>
+        <a href="/quizMeDB/register">register</a>
+        <a href="/quizMeDB/logout">Logout</a>
+    </div>
+    <div th:if="${cookieName == null}">
+        <p>User not logged in!</p>
+        <a href="/quizMeDB/register">Register</a>
+    </div>
+    <!-- You can display a success message or redirect the user to another page -->
+</body>
+</html>
