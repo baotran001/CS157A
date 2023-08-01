@@ -78,7 +78,7 @@ public class MyRoutes {
          // Statement Execution
          try{
              Statement statement = connection.createStatement();
-             String query = "SELECT * FROM USERS WHERE email = '" + username + "' OR password = '" +
+             String query = "SELECT * FROM USERS WHERE uid = '" + username + "' AND password = '" +
              password + "';";
              ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()){

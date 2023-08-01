@@ -10,7 +10,7 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 public class ServerApplication {
 
-    public static void main(String[] args) throws SQLException{;
+    public static void main(String[] args) throws SQLException {
         SpringApplication.run(ServerApplication.class, args);
         // Create database 
         Connection connection = createSQLConnection();
@@ -19,11 +19,11 @@ public class ServerApplication {
         String query = "CREATE DATABASE IF NOT EXISTS " + dbName;
         statement.executeUpdate(query);
         // Check if tables already exist
-        String query1 = "use " + dbName + ";";
+        String query1 = "USE " + dbName + ";";
         statement.executeUpdate(query1);
-        String query2 = "Show tables;";
+        String query2 = "SHOW TABLES;";
         ResultSet rs = statement.executeQuery(query2);
-        if(!rs.next()){
+        if (!rs.next()) {
             ScriptUtils.executeSqlScript(connection, new ClassPathResource("createdb.sql"));
         }
         connection.close();
