@@ -6,6 +6,7 @@ CREATE TABLE Users(
 
 CREATE TABLE Folder(
     fid VARCHAR(15) PRIMARY KEY,
+    name VARCHAR(30) NOT NULL,
     author VARCHAR(15) NOT NULL,
     description VARCHAR(255)
 );
