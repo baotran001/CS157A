@@ -1,4 +1,3 @@
-CREATE DATABASE quizmedb;
 USE quizmedb;
 
 CREATE TABLE Users(
