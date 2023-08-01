@@ -29,7 +29,7 @@ public class MyRoutes {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) throws SQLException{
         // Get User parameters
-        String uid = user.getUID();
+        String username = user.getUsername();
         String email = user.getEmail();
         String password = user.getPassword();
         //System.out.println(uid + " " + email + " " + password);
@@ -40,18 +40,17 @@ public class MyRoutes {
          // Statement Execution
          try{
              Statement statement = connection.createStatement();
-             String query1 = "SELECT * FROM USERS WHERE email = '" + email + "' OR password = '"
-             + password + "';";
+             String query1 = "SELECT * FROM USERS WHERE uid = '" + username + "';";
              ResultSet resultSet = statement.executeQuery(query1);
              // check if registered data already exists in database. 
              if(resultSet.next()){
                 // display error 
-                redirectAttributes.addFlashAttribute("errorMessage", "Email or password already used");
+                redirectAttributes.addFlashAttribute("errorMessage", "username already used");
                 return "redirect:/quizMeDB/register";
              }
              // no duplicate, add user into database
              String query = "INSERT INTO USERS (uid, password, email) " + "VALUES ('" 
-             + uid + "', '" + password + "', '" + email + "');";
+             + username + "', '" + password + "', '" + email + "');";
              //System.out.println(query);
              // use executeUpdate for insert statements
              statement.executeUpdate(query);
@@ -73,17 +72,17 @@ public class MyRoutes {
 
     @PostMapping("/login")
     public String loginUser(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes,  HttpServletResponse response) throws SQLException{
-        String email = user.getEmail();
+        String username = user.getUsername();
         String password = user.getPassword();
         Connection connection = createSQLConnection();
          // Statement Execution
          try{
              Statement statement = connection.createStatement();
-             String query = "SELECT * FROM USERS WHERE email = '" + email + "' AND password = '"
-             + password + "';";
+             String query = "SELECT * FROM USERS WHERE email = '" + username + "' OR password = '" +
+             password + "';";
              ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()){
-                Cookie cookie = new Cookie("user_email", email);
+                Cookie cookie = new Cookie("user_uid", username);
                 cookie.setMaxAge(3600); // Set the cookie's expiration time in seconds (1 hour in this example)
                 response.addCookie(cookie);
                 return "redirect:/quizMeDB/home";
@@ -95,26 +94,26 @@ public class MyRoutes {
              System.out.println("VendorError:" + E.getErrorCode());
          }
         // if user does not exist then display error message
-        redirectAttributes.addFlashAttribute("errorMessage", "Invalid email or password.");
+        redirectAttributes.addFlashAttribute("errorMessage", "Incorrect username or password.");
         return "redirect:/quizMeDB/login";
     }
 
     @GetMapping("/home")
-    public String showHome(@CookieValue(name = "user_email", required = false) Cookie cookie, Model model){
+    public String showHome(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model){
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
         return "home";
     }
     @GetMapping("/logout")
-    public String logOff(@CookieValue(name = "user_email", required = false) Cookie cookie, Model model, HttpServletResponse response){
+    public String logOff(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model, HttpServletResponse response){
         // delete cookie to log out
         if(cookie != null){
             cookie.setMaxAge(0);
             cookie.setValue(null);
             response.addCookie(cookie);
         }
-        return "redirect:/quizMeDB/register";
+        return "redirect:/quizMeDB/login";
     }
 
     public static Connection createSQLConnection() throws SQLException{

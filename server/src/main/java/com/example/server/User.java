@@ -1,19 +1,19 @@
 package com.example.server;
 import java.util.Random;
 public class User {
-
-    private static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
     // User Schema
-    private String uid;
+    private String username;
     private String email;
     private String password;
 
     public User(){
-        this.uid = generateRandomID(15);
     }
-    public String getUID(){
-        return this.uid;
+    
+    public String getUsername(){
+        return this.username;
+    }
+    public void setUsername(String username){
+        this.username = username;
     }
     public String getEmail(){
         return this.email;
@@ -26,15 +26,5 @@ public class User {
     }
     public void setPassword(String pass){
         this.password = pass;
-    }
-    private String generateRandomID(int length){
-        Random random = new Random();
-        String randomID = "";
-
-        for( int i = 0; i < length; i++){
-            int index = random.nextInt(ALPHA_NUMERIC_STRING.length());
-            randomID += ALPHA_NUMERIC_STRING.charAt(index);
-        }
-        return randomID;
     }
 }
