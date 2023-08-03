@@ -2,8 +2,7 @@ USE quizmedb;
 
 CREATE TABLE Users(
     uid VARCHAR(15) PRIMARY KEY, 
-    password VARCHAR(30) NOT NULL, 
-    email VARCHAR(30) NOT NULL
+    password VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE Folder(
