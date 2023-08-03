@@ -30,7 +30,6 @@ public class MyRoutes {
     public String registerUser(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) throws SQLException{
         // Get User parameters
         String username = user.getUsername();
-        String email = user.getEmail();
         String password = user.getPassword();
         //System.out.println(uid + " " + email + " " + password);
         
@@ -49,8 +48,8 @@ public class MyRoutes {
                 return "redirect:/quizMeDB/register";
              }
              // no duplicate, add user into database
-             String query = "INSERT INTO USERS (uid, password, email) " + "VALUES ('" 
-             + username + "', '" + password + "', '" + email + "');";
+             String query = "INSERT INTO USERS (uid, password) " + "VALUES ('" 
+             + username + "', '" + password + "');";
              //System.out.println(query);
              // use executeUpdate for insert statements
              statement.executeUpdate(query);
