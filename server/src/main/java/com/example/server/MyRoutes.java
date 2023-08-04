@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.util.WebUtils;
 
 @Controller
 @RequestMapping("/quizMeDB")
@@ -35,7 +33,7 @@ public class MyRoutes {
         
         // Add user to database
          // Establish SQL Connection
-         Connection connection = createSQLConnection();
+         Connection connection = Utility.createSQLConnection();
          // Statement Execution
          try{
              Statement statement = connection.createStatement();
@@ -73,7 +71,7 @@ public class MyRoutes {
     public String loginUser(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes,  HttpServletResponse response) throws SQLException{
         String username = user.getUsername();
         String password = user.getPassword();
-        Connection connection = createSQLConnection();
+        Connection connection = Utility.createSQLConnection();
          // Statement Execution
          try{
              Statement statement = connection.createStatement();
@@ -113,30 +111,5 @@ public class MyRoutes {
             response.addCookie(cookie);
         }
         return "redirect:/quizMeDB/login";
-    }
-
-    public static Connection createSQLConnection() throws SQLException{
-        // Load Driver
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            }
-        catch (Exception E) {
-            System.err.println("Unable to load driver.");
-            E.printStackTrace();
-        }
-
-        // Define Connection URL
-        String host = "localhost";
-        String dbName = "quizmedb";
-        int port = 3306;
-        String url = "jdbc:mysql://" + host + ":" +
-        port + "/" + dbName;
-
-        // Connect to Database
-        String username = "root";
-        String password = "Bb32003211";
-        Connection connection = DriverManager.getConnection(url, username, password);
-
-        return connection;
     }
 }
