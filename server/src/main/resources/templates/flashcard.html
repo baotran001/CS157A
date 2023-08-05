@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Flash Card</title>
+    <link href="../static/css/flashcard.css" rel="stylesheet" type="text/css" th:href="@{/css/flashcard.css}" />
+</head>
+<body>
+    <div th:if="${cookieName}">
+        <p style="font-size: 24; text-align: right;">Logged In As <span th:text="${cookieName}"></span></p>
+        <h1 style="text-align: center;" >Create A Flashcard</h1>
+        <form action="#" th:action="@{/quizMeDB/createFlashcard}" th:object="${flashcard}" method="post">
+                <!-- Display register success message  -->
+            <div th:if="${success}">
+                <p th:text="${success}"></p>
+            </div>
+            <div class="container">
+    
+              <label><b>Add a Term(Question or Vocabulary)</b></label>
+              <input type="text" placeholder="Enter the Term" th:field="*{front}" required>
+          
+              <label><b>Add the Answer</b></label>
+              <input type="text" placeholder="Enter the Answer" th:field="*{back}" required>
+          
+              <button type="submit" class="registerbtn">Submit</button>
+            </div>
+        
+        </form>
+        <h1 style="margin-top: 20px" >View Flashcards</h1>
+        <div th:each="item : ${dataList}" class="container" style="margin-right: auto; margin-left: auto; display: inline-block;">
+            <!-- Iterate through the ArrayList and display each item -->
+            <p th:text="${item.getFront()}"></li>
+            <p th:text="${item.getBack()}"></li>
+        </div>
+    </div>
+    <div th:if="${cookieName == null}">
+        <p>User not logged in!</p>
+        <a href="/quizMeDB/login">Sign in</a>
+    </div>
+</body>
+</html>
