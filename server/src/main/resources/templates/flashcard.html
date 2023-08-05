@@ -3,6 +3,29 @@
 <head>
     <title>Create Flash Card</title>
     <link href="../static/css/flashcard.css" rel="stylesheet" type="text/css" th:href="@{/css/flashcard.css}" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    card.classList.toggle('flipped');
+                    
+                    // Toggle content visibility
+                    const frontContent = card.querySelector('.card-content-front');
+                    const backContent = card.querySelector('.card-content-back');
+                    
+                    if (card.classList.contains('flipped')) {
+                        frontContent.style.display = 'none';
+                        backContent.style.display = 'block';
+                    } else {
+                        frontContent.style.display = 'block';
+                        backContent.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <div th:if="${cookieName}">
@@ -25,11 +48,18 @@
             </div>
         
         </form>
-        <h1 style="margin-top: 20px" >View Flashcards</h1>
-        <div th:each="item : ${dataList}" class="container" style="margin-right: auto; margin-left: auto; display: inline-block;">
-            <!-- Iterate through the ArrayList and display each item -->
-            <p th:text="${item.getFront()}"></li>
-            <p th:text="${item.getBack()}"></li>
+        <h1 style="margin-top: 20px; text-align: center;" >View Flashcards</h1>
+        <div class="card-container">
+            <div class="card" th:each="item : ${dataList}">
+                <div class="card-content-front">
+                    <h2>Front</h2>
+                    <p th:text="${item.getFront()}"></p>
+                </div>
+                <div class="card-content-back">
+                    <h2>Back</h2>
+                    <p th:text="${item.getBack()}"></p>
+                </div>
+            </div>
         </div>
     </div>
     <div th:if="${cookieName == null}">

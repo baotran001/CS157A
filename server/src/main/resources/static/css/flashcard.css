@@ -69,3 +69,34 @@ body {
     background-color: #f1f1f1;
     text-align: center;
   }
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center; /* Align items vertically */
+    margin: 0 auto; /* Center the container horizontally */
+}
+
+.card {
+    user-select: none;
+    width: 300px;
+    height: 300px;
+    margin-left: 15px;
+    margin-bottom: 15px;
+    background-color: white;
+    border-radius: 10px;
+    border: 0.1px solid gray;
+    padding: 10px;
+    box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    font-size: 25px;
+}
+
+.card:hover{
+  background-color:#04AA6D
+}
+
+.card-content-back{
+  display: none;
+}
