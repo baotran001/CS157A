@@ -1,3 +1,4 @@
+USE quizmedb;
 DROP TABLE UserHasFollowingList;
 DROP TABLE CommentsHasLikesList;
 DROP TABLE ReviewsHasComments;
@@ -13,3 +14,4 @@ DROP TABLE Tag;
 DROP TABLE Sets;
 DROP TABLE Folder;
 DROP TABLE Users;
+DROP TABLE FrontHasBack;

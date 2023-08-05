@@ -18,14 +18,15 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/quizMeDB")
 public class FlashcardRoutes {
     @GetMapping("/flashcard")
-    public String displayFlashcardsPage(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+    public String displayFlashcardsPage(RedirectAttributes redirectAttributes, @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
         model.addAttribute("flashcard", new FlashCard());
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
-        String query = "Select * FROM flashcards;";
+        String query = "Select F.flashid, F.favorite, F.front, FB.back FROM flashcards F, FrontHasBack FB" +
+        " WHERE F.front = FB.front;";
         ResultSet res = statement.executeQuery(query);
         ArrayList<FlashCard> flashcArr = new ArrayList<>();
         while (res.next()) {
@@ -33,19 +34,20 @@ public class FlashcardRoutes {
             String favorite = res.getString("favorite");
             String front = res.getString("front");
             String back = res.getString("back");
+
             FlashCard flashc = new FlashCard();
+            System.out.println(front + " " + back);
             flashc.setFlashid(flashid);
             flashc.setFavorite(favorite);
             flashc.setFront(front);
             flashc.setBack(back);
             flashcArr.add(flashc);
-            // ... Print other columns as needed
         }
         model.addAttribute("dataList", flashcArr);
         return "flashcard";
     }
     @PostMapping("/createFlashcard")
-    public String createFlashcard(@ModelAttribute("flashcard") FlashCard flashcard, RedirectAttributes redirectAttributes) throws SQLException{
+    public String createFlashcard(Model model, @ModelAttribute("flashcard") FlashCard flashcard, RedirectAttributes redirectAttributes) throws SQLException{
         String flashid = flashcard.getFlashid();
         String favorite = flashcard.getFavorite();
         String front = flashcard.getFront();
@@ -53,8 +55,19 @@ public class FlashcardRoutes {
 
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
-        String query = "INSERT INTO flashcards (flashid, favorite, front, back) " + "VALUES ('" 
-        + flashid + "', '" + favorite + "', '" + front + "', '" + back + "');";
+        try{
+            String query1 = "INSERT INTO FrontHasBack (front, back) " + "VALUES ('" 
+            + front + "', '" + back  + "');";
+            statement.executeUpdate(query1);
+        }catch(SQLException E){
+            System.out.println("SQLException:" + E.getMessage());
+            System.out.println("SQLState:" + E.getSQLState());
+            System.out.println("VendorError:" + E.getErrorCode());
+            redirectAttributes.addFlashAttribute("errorMessage", "The flashcard already exists!");
+            return "redirect:/quizMeDB/flashcard"; // Redirect to the error page with the error message
+        }
+        String query = "INSERT INTO flashcards (flashid, favorite, front) " + "VALUES ('" 
+        + flashid + "', '" + favorite + "', '" + front  + "');";
         statement.executeUpdate(query);
         connection.close();
         redirectAttributes.addFlashAttribute("success", "Success!");
