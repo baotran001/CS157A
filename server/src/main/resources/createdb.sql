@@ -52,8 +52,12 @@ CREATE TABLE SetHasTag(
 CREATE TABLE Flashcards(
     flashid VARCHAR(15) PRIMARY KEY,
     favorite CHAR(1) NOT NULL DEFAULT 'N',
-    front VARCHAR(255) NOT NULL,
-    back VARCHAR(255) NOT NULL
+    front VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE FrontHasBack(
+    front VARCHAR(255) PRIMARY KEY,
+    back VARCHAR(255)
 );
 
 CREATE TABLE SetHasFlashcards(
