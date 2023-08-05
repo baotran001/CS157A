@@ -28,6 +28,14 @@ CREATE TABLE Sets(
     description VARCHAR(255)
 );
 
+CREATE TABLE UserCreatesSets(
+    uid VARCHAR(15) NOT NULL,
+    sid VARCHAR(15) NOT NULL,
+    PRIMARY KEY (uid, sid),
+    FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE,
+    FOREIGN KEY (sid) REFERENCES Sets(sid) ON DELETE CASCADE
+);
+
 CREATE TABLE Tag(
     tid VARCHAR(15) PRIMARY KEY,
     tag_name VARCHAR(50)
