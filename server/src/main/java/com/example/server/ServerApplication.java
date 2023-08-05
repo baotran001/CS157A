@@ -1,6 +1,8 @@
 package com.example.server;
 import java.sql.*;
 
+import org.apache.logging.log4j.core.config.Configurator;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -11,6 +13,7 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 public class ServerApplication {
 
     public static void main(String[] args) throws SQLException {
+        
         SpringApplication.run(ServerApplication.class, args);
         // Create database 
         Connection connection = createSQLConnection();
