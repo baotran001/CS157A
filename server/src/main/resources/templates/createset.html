@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Set</title>
+    <link href="../static/css/flashcard.css" rel="stylesheet" type="text/css" th:href="@{/css/flashcard.css}" />
+</head>
+<body>
+    <!--div th:replace = "~{base.html :: content}"--> 
+        <div th:if="${cookieName}">
+            <p style="font-size: 24; text-align: right;">Logged In As <span th:text="${cookieName}"></span></p>
+            <a href="/quizMeDB/logout">Logout</a>
+            <h1 style="text-align: center;" >Creating A New Set</h1>
+
+            <form action="#" th:action="@{/quizMeDB/createSets}" th:object="${sets}" method="post">
+                <!-- Display success message  -->
+                <div th:if="${success}">
+                    <p th:text="${success}"></p>
+                </div>
+                <div class="container">
+                    <label><b>Create Set Name</b></label>
+                    <input type="text" placeholder="Enter Set Name" th:field="*{name}" required>
+                
+                    <label><b>Create Set Description</b></label>
+                    <input type="text" placeholder="Enter Description" th:field="*{description}" required>
+                
+                    <button type="submit" class="registerbtn">Submit</button>
+                </div>
+        
+            </form>
+
+        </div>
+        <div th:if="${cookieName == null}">
+            <p>User not logged in!</p>
+            <a href="/quizMeDB/login">Sign in</a>
+        </div>
+    <!-- You can display a success message or redirect the user to another page -->
+</body>
+</html>
