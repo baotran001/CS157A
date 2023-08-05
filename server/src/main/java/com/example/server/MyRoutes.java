@@ -97,6 +97,7 @@ public class MyRoutes {
 
     @GetMapping("/home")
     public String showHome(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model){
+        // Assign cookieName as name of user
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
