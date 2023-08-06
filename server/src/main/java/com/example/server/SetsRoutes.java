@@ -54,7 +54,7 @@ public class SetsRoutes {
         
         if (cookie != null) {
             String uid = cookie.getValue();
-            set.setSetauthor(uid); // Set the user's uid as the author
+            set.setAuthor(uid); // Set the user's uid as the author
         }
         String sid = set.getSid();
         String name = set.getName();
