@@ -31,7 +31,7 @@ public class SetsRoutes {
         ResultSet res = statement.executeQuery(query);
         ArrayList<Sets> setsArr = new ArrayList<>();
         while (res.next()) {
-            String sid = res.getString("setsid");
+            String sid = res.getString("sid");
             String name = res.getString("name");
             String author = res.getString("author");
             java.sql.Date date = res.getDate("date");
@@ -49,7 +49,13 @@ public class SetsRoutes {
         return "createset";
     }
     @PostMapping("/createSets")
-    public String createSets(@ModelAttribute("sets") Sets set, RedirectAttributes redirectAttributes) throws SQLException{
+    public String createSets(@ModelAttribute("sets") Sets set, RedirectAttributes redirectAttributes,
+                             @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException{
+        
+        if (cookie != null) {
+            String uid = cookie.getValue();
+            set.setSetauthor(uid); // Set the user's uid as the author
+        }
         String sid = set.getSid();
         String name = set.getName();
         String author = set.getAuthor();

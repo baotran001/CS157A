@@ -2,6 +2,7 @@ package com.example.server;
 import java.util.Random;
 import java.util.Objects;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Sets {
@@ -13,6 +14,7 @@ public class Sets {
 
     public Sets(){
         this.sid = Utility.generateRandomId(15);
+        this.date = java.sql.Date.valueOf(LocalDate.now());
     }
 
     public String getSid(){
