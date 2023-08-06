@@ -4,7 +4,7 @@
     <title>Search</title>
     <link href="../static/css/flashcard.css" rel="stylesheet" type="text/css" th:href="@{/css/flashcard.css}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    
+    <link rel="stylesheet" th:href="@{/css/search.css}" type="text/css">
 </head>
 
 <body>
@@ -15,40 +15,42 @@
                 <img src="https://media.discordapp.net/attachments/1136904785694568530/1137548841906884688/Screenshot_2023-08-05_at_5.52.44_PM.png"
                     alt="logo" style="width:340px;height:100px;">
             </picture>
-        </center>
+        <div class="parent-container">
+            <div class="button-box">
+                <div class="tabBox">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                        <input type="hidden" name="searched" th:value="${searched}">
+                        <input type="hidden" name="searchType" value="flashcardSets">
+                        <button class="tabText" type="submit">Flashcard sets</button>
+                    </form>
+                </div>
+                <div class="tabBox">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchusers">
+                        <input type="hidden" name="searched" th:value="${searched}">
+                        <input type="hidden" name="searchType" value="users">
+                        <button class="tabText" type="submit">Users</button>
+                    </form>
+                </div>
+            </div>
+            <div class="container">
+                <div th:if="${#lists.isEmpty(flashcardSets)}">
+                    <p th:text="'No sets found with the given name: ' + ${searched}"></p>
+                </div>
+                <div th:if="${not #lists.isEmpty(flashcardSets)}">
+                    <!-- Use Thymeleaf's th:each attribute to iterate through the search results -->
+                    <!-- Assuming 'flashcardSets' is the name of the attribute in the model that contains the search results -->
+                    <div th:each="flashcardSet : ${flashcardSets}" class = "results-container">
+                        <!-- Display the details of each flashcard set -->
+                        <div class="result-name"><p>Name: <span th:text="${flashcardSet.name}"></span></p></div>
+                        <p>Author: <span th:text="${flashcardSet.author}"></span></p>
+                        <p>Date: <span th:text="${flashcardSet.date}"></span></p>
+                        <p>Description: <span th:text="${flashcardSet.description}"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </center>
 
-        <div class="tabs">
-            <div class="tabBox">
-                <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
-                    <input type="hidden" name="searched" th:value="${searched}">
-                    <input type="hidden" name="searchType" value="flashcardSets">
-                    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Flashcard sets</button>
-                </form>
-            </div>
-            <div class="tabBox">
-                <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchusers">
-                    <input type="hidden" name="searched" th:value="${searched}">
-                    <input type="hidden" name="searchType" value="users">
-                    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Users</button>
-                </form>
-            </div>
-        </div>
-
-        <div th:if="${#lists.isEmpty(flashcardSets)}">
-            <p th:text="'No sets found with the given name: ' + ${searched}"></p>
-        </div>
-        <div th:if="${not #lists.isEmpty(flashcardSets)}">
-            <!-- Use Thymeleaf's th:each attribute to iterate through the search results -->
-            <!-- Assuming 'flashcardSets' is the name of the attribute in the model that contains the search results -->
-            <div th:each="flashcardSet : ${flashcardSets}">
-                <!-- Display the details of each flashcard set -->
-                <p>Set ID: <span th:text="${flashcardSet.sid}"></span></p>
-                <p>Name: <span th:text="${flashcardSet.name}"></span></p>
-                <p>Author: <span th:text="${flashcardSet.author}"></span></p>
-                <p>Date: <span th:text="${flashcardSet.date}"></span></p>
-                <p>Description: <span th:text="${flashcardSet.description}"></span></p>
-            </div>
-        </div>
     </div>
 </body>
 
