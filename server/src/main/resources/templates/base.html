@@ -13,7 +13,7 @@
   </head>
   <body>
     <header>
-      <nav class="navbar" style="background-color: #04AA6D;">
+    <nav class="navbar navbar-expand-lg navbar-light bg-success">
         <img src="https://media.discordapp.net/attachments/1136904785694568530/1137548841906884688/Screenshot_2023-08-05_at_5.52.44_PM.png" width="136" height="40" />
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -46,9 +46,9 @@
                 </li>
             </div>
           </ul>
-            <form class="form-inline my-2 my-lg-0" method="POST" action="{{url_for('search')}}">
+            <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
               <input name = "searched" class="form-control mr-sm-2" type="search" placeholder="Search for a Plant/User" aria-label="Search">
-              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+              <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
             </form>
             </div>
       </nav>
