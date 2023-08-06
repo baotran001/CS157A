@@ -101,14 +101,19 @@ public class MyRoutes {
         return "redirect:/quizMeDB/login";
     }
 
+    
+
     @GetMapping("/home")
     public String showHome(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model){
         // Assign cookieName as name of user
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
+
+        
         return "home";
     }
+
     @GetMapping("/logout")
     public String logOff(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model, HttpServletResponse response){
         // delete cookie to log out
