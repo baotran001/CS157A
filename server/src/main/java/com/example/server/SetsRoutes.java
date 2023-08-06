@@ -50,7 +50,7 @@ public class SetsRoutes {
     }
     @PostMapping("/createSets")
     public String createSets(@ModelAttribute("sets") Sets set, RedirectAttributes redirectAttributes,
-                             @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException{
+                             @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         
         String uid = cookie.getValue();
         set.setAuthor(uid); // Set the user's uid as the author
@@ -64,16 +64,30 @@ public class SetsRoutes {
         
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
-        String query1 = "INSERT INTO sets (sid, name, author, date, description) " + "VALUES ('" 
-        + sid + "', '" + name + "', '" + author  + "', '" + date + "', '" + description + "');";
-        statement.executeUpdate(query1);
+        String query = "Select Count(*) FROM Sets WHERE name = '" + name +
+        "'" + "AND description = '" + description + "' AND author = '" + author + "';";
+        ResultSet rs = statement.executeQuery(query);
 
-        String query2 = "INSERT INTO UserCreatesSets (uid, sid) " + "VALUES ('" 
-        + uid + "', '" + sid + "');";
-        statement.executeUpdate(query2);
+        int count = 0;
+        if (rs.next()) {
+            count = rs.getInt("Count(*)");
+        }
+        System.out.println(count);
+        if (count == 0){
+            System.out.println(sid);
+            String query1 = "INSERT INTO sets (sid, name, author, date, description) " + "VALUES ('" 
+            + sid + "', '" + name + "', '" + author  + "', '" + date + "', '" + description + "');";
+            statement.executeUpdate(query1);
 
+            String query2 = "INSERT INTO UserCreatesSets (uid, sid) " + "VALUES ('" 
+            + uid + "', '" + sid + "');";
+            statement.executeUpdate(query2);
+            redirectAttributes.addFlashAttribute("success", "Successful Set Creation!");
+            return "redirect:/quizMeDB/flashcard?sid=" + sid + "&name=" + name;
+        }
+        
         connection.close();
-        redirectAttributes.addFlashAttribute("success", "Successful Set Creation!");
-        return "redirect:/quizMeDB/flashcard?sid=" + sid;
+        redirectAttributes.addFlashAttribute("error", "Set Already Exists!");
+        return "redirect:/quizMeDB/sets";
     }
 }
