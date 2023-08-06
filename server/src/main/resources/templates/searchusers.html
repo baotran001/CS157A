@@ -10,52 +10,50 @@
 <body>
     <div th:replace="~{base :: header}"></div>
     <div th:fragment="content"> 
-    <center>
+        <center>
             <picture>
                 <img src="https://media.discordapp.net/attachments/1136904785694568530/1137548841906884688/Screenshot_2023-08-05_at_5.52.44_PM.png"
                     alt="logo" style="width:340px;height:100px;">
             </picture>
         
-        <div class="parent-container">
-            <div class="tab">
-                <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
-                    <input type="hidden" name="searched" th:value="${searched}">
-                    <input type="hidden" name="searchType" value="flashcardSets">
-                    <button class="tabBox" type="submit">Flashcard sets</button>
-                </form>
-            </div>
-            <div class="tab">
-                <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchusers">
-                    <input type="hidden" name="searched" th:value="${searched}">
-                    <input type="hidden" name="searchType" value="users">
-                    <button class="tabBox" type="submit">Users</button>
-                </form>
-            </div>
-        <div class="container">
-        <div th:if="${#lists.isEmpty(users)}">
-            <p th:text="'No users found with the given username: ' + ${searched}"></p>
-        </div>
-        <div th:if="${not #lists.isEmpty(users)}">
-            <!-- Display the details of each user -->
-            <div th:each="user : ${users}" class="results-container">
-                <!-- Display the details of each user -->
-                <p class="result-name" th:text="'Name: ' + ${user.key}"></p>
-                <p th:text="'Following count: ' + ${user.value}"></p>
-            <!--<p class="following-count" th:text="'Following Count: ' + ${user.value}"></p> -->
-        </div>
-                <!-- follow button -->
-                <div>
-                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/follow">
+            <div class="parent-container">
+                <div class="tab">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
                         <input type="hidden" name="searched" th:value="${searched}">
-                        <input type="hidden" name="searchType" value="follow">
-                        <button  class="follow-button" type="submit">follow</button>
+                        <input type="hidden" name="searchType" value="flashcardSets">
+                        <button class="tabBox" type="submit">Flashcard sets</button>
                     </form>
                 </div>
+                <div class="tab">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchusers">
+                        <input type="hidden" name="searched" th:value="${searched}">
+                        <input type="hidden" name="searchType" value="users">
+                        <button class="tabBox" type="submit">Users</button>
+                    </form>
+                </div>
+                <div class="container">
+                    <div th:if="${noUsersFound}">
+                        <p th:text="'No users found with the given username: ' + ${searched}"></p>
+                    </div>
+                    <div th:if="${not #lists.isEmpty(users)}">
+                        <!-- Display the details of each user -->
+                        <div th:each="user : ${users}" class="results-container">
+                            <!-- Display the details of each user -->
+                            <p class="result-name" th:text="'Name: ' + ${user.key}"></p>
+                            <p th:text="'Following count: ' + ${user.value}"></p>
+                            <!-- follow button -->
+                            <div th:if="${!searched.equals(cookieName) && cookieName != null}">
+                                <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/follow">
+                                    <input type="hidden" name="searched" th:value="${searched}">
+                                    <input type="hidden" name="searchType" value="follow">
+                                    <button class="follow-button" type="submit" th:text="${isFollowing ? 'Unfollow' : 'Follow'}"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    </div>
-    </center>
+        </center>
     </div>
 </body>
 </html>

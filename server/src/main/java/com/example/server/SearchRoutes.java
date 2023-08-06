@@ -144,10 +144,29 @@ public String searchUser(@RequestParam("searched") String searchKeywords, Model 
             followingCountStatement.close();
         }
 
-        // Add the user search results to the model as an attribute.
+        // Check if the current user is following the searched user
+        boolean isFollowing = false;
+        if (cookie != null) {
+            String loggedInUserUid = cookie.getValue();
+            String checkFollowingQuery = "SELECT COUNT(*) FROM UserHasFollowingList WHERE uid = ? AND fid = ?";
+            PreparedStatement checkFollowingStatement = connection.prepareStatement(checkFollowingQuery);
+            checkFollowingStatement.setString(1, loggedInUserUid);
+            checkFollowingStatement.setString(2, searchKeywords);
+            ResultSet checkFollowingResultSet = checkFollowingStatement.executeQuery();
+            if (checkFollowingResultSet.next() && checkFollowingResultSet.getInt(1) > 0) {
+                // The current user is following the searched user
+                isFollowing = true;
+            }
+            checkFollowingResultSet.close();
+            checkFollowingStatement.close();
+        }
+
+        // Add the user search results and the isFollowing flag to the model
         model.addAttribute("users", searchResults);
-        // Add the search query to the model as an attribute.
         model.addAttribute("searched", searchQuery);
+        model.addAttribute("isFollowing", isFollowing);
+        boolean noUsersFound = searchResults.isEmpty();
+        model.addAttribute("noUsersFound", noUsersFound);
     } catch (SQLException e) {
         e.printStackTrace();
     } finally {
@@ -231,5 +250,6 @@ public String follow(@RequestParam("searched") String searchKeywords, Model mode
     // Run the searchUser method to display the search results with the updated following count
     return searchUser(searchKeywords, model, cookie);
 }
+
     
 }
