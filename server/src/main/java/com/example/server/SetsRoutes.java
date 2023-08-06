@@ -54,15 +54,22 @@ public class SetsRoutes {
         
         if (cookie != null) {
             String uid = cookie.getValue();
-            set.setSetauthor(uid); // Set the user's uid as the author
+            set.setAuthor(uid); // Set the user's uid as the author
         }
         String sid = set.getSid();
         String name = set.getName();
         String author = set.getAuthor();
         java.sql.Date date = set.getDate();
         String description = set.getDescription();
-        System.out.println(sid + " " + author + " " + name + " " + description + " " + date);
+        //System.out.println(sid + " " + author + " " + name + " " + description + " " + date);
         
+        Connection connection = Utility.createSQLConnection();
+        Statement statement = connection.createStatement();
+        String query = "INSERT INTO sets (sid, name, author, date, description) " + "VALUES ('" 
+        + sid + "', '" + name + "', '" + author  + "', '" + date + "', '" + description + "');";
+        statement.executeUpdate(query);
+        connection.close();
+        redirectAttributes.addFlashAttribute("success", "Success!");
         return "redirect:/quizMeDB/sets";
     }
 }
