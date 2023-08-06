@@ -97,23 +97,28 @@ public class SearchRoutes {
     }
     @PostMapping("/searchusers")
     public String searchUser(@RequestParam("searched") String searchKeywords, Model model,
-                            @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
-        if(cookie != null){
-            model.addAttribute("cookieName",cookie.getValue());
+                             @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+        if (cookie != null) {
+            model.addAttribute("cookieName", cookie.getValue());
         }
+    
         // Check if searchKeywords is null or empty, and provide a default value if necessary
         String searchQuery = (searchKeywords != null && !searchKeywords.isEmpty()) ? searchKeywords : "Not specified";
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        ArrayList<String> searchResults = new ArrayList<>();
-
+        Map<String, Integer> searchResults = new HashMap<>(); // Using a HashMap to store name and following count.
+    
         try {
             // Establish a connection to the database
             connection = Utility.createSQLConnection();
     
-            // Prepare the SQL query to search for users by name
-            String query = "SELECT * FROM Users WHERE uid= ?";
+            // Prepare the SQL query to search for users by name and get the following count
+            String query = "SELECT u.uid, COUNT(f.fid) AS followingCount " +
+                           "FROM Users u " +
+                           "LEFT JOIN UserHasFollowingList f ON u.uid = f.fid AND f.fid != u.uid " +
+                           "WHERE u.uid = ? " +
+                           "GROUP BY u.uid";
             statement = connection.prepareStatement(query);
     
             // Set the searchKeywords as the parameter in the query
@@ -122,10 +127,11 @@ public class SearchRoutes {
             // Execute the query and get the result set
             resultSet = statement.executeQuery();
     
-            // Process the search results and add user names to the searchResults ArrayList
+            // Process the search results and add user names and following count to the searchResults HashMap
             while (resultSet.next()) {
                 String name = resultSet.getString("uid");
-                searchResults.add(name);
+                int followingCount = resultSet.getInt("followingCount");
+                searchResults.put(name, followingCount);
             }
     
             // Add the user search results to the model as an attribute.
@@ -147,9 +153,7 @@ public class SearchRoutes {
             }
         }
     
-
         return "searchusers"; // Return the same view to display the search results.
     }
-
-
+    
 }

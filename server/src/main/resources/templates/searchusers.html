@@ -39,7 +39,8 @@
             <!-- Display the details of each user -->
             <div th:each="user : ${users}" class="results-container">
                 <!-- Display the details of each user -->
-                <p class="result-name" th:text="'Name: ' + ${user}"></p>
+                <p class="result-name" th:text="'Name: ' + ${user.key}"></p>
+                <p th:text="'Following count: ' + ${user.value}"></p>
             <!--<p class="following-count" th:text="'Following Count: ' + ${user.value}"></p> -->
         </div>
                 <!-- follow button -->
