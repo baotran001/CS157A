@@ -27,7 +27,7 @@ public class Sets {
         return this.name;
     }
 
-    public void setSetname(String name){
+    public void setName(String name){
         this.name = name;
     }
 
@@ -35,7 +35,7 @@ public class Sets {
         return this.author;
     }
 
-    public void setSetauthor(String author){
+    public void setAuthor(String author){
         this.author = author;
     }
 
@@ -43,7 +43,7 @@ public class Sets {
         return this.date;
     }
 
-    public void setSetdate(java.sql.Date date){
+    public void setDate(java.sql.Date date){
         this.date = date;
     }
 
@@ -51,33 +51,8 @@ public class Sets {
         return this.description;
     }
 
-    public void setSetdescription(String description){
+    public void setDescription(String description){
         this.description = description;
-    }
-
-    public Sets setid(String setid) {
-        setSetid(setid);
-        return this;
-    }
-
-    public Sets name(String name) {
-        setSetname(name);
-        return this;
-    }
-
-    public Sets author(String author) {
-        setSetauthor(author);
-        return this;
-    }
-
-    public Sets date(java.sql.Date date) {
-        setSetdate(date);
-        return this;
-    }
-
-    public Sets description(String description) {
-        setSetdescription(description);
-        return this;
     }
 
     @Override

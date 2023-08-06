@@ -38,10 +38,10 @@ public class SetsRoutes {
             String description = res.getString("description");
             Sets sets = new Sets();
             sets.setSetid(sid);
-            sets.setSetname(name);
-            sets.setSetauthor(author);
-            sets.setSetdate(date);
-            sets.setSetdescription(description);
+            sets.setName(name);
+            sets.setAuthor(author);
+            sets.setDate(date);
+            sets.setDescription(description);
             setsArr.add(sets);
             // ... Print other columns as needed
         }
@@ -55,7 +55,7 @@ public class SetsRoutes {
         String author = set.getAuthor();
         java.sql.Date date = set.getDate();
         String description = set.getDescription();
-        System.out.println(name + " " + description);
+        System.out.println(sid + " " + author + " " + name + " " + description + " " + date);
         
         return "redirect:/quizMeDB/sets";
     }
