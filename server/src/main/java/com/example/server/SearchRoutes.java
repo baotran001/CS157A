@@ -48,13 +48,12 @@ public class SearchRoutes {
             connection = Utility.createSQLConnection();
 
             // Prepare the SQL query to search for flashcard sets
-            String query = "SELECT * FROM Sets WHERE name LIKE ? OR description LIKE ?";
+            String query = "SELECT * FROM Sets WHERE name LIKE ?";
             statement = connection.prepareStatement(query);
 
             // Set the searchKeywords as the parameter in the query
             String searchString = "%" + searchKeywords + "%";
             statement.setString(1, searchString);
-            statement.setString(2, searchString);
 
             // Execute the query and get the result set
             resultSet = statement.executeQuery();
@@ -62,12 +61,14 @@ public class SearchRoutes {
             model.addAttribute("searched", searchQuery);
             // Process the search results and add them to the searchResults ArrayList
             while (resultSet.next()) {
+                String sid = resultSet.getString("sid");
                 String name = resultSet.getString("name");
                 String author = resultSet.getString("author");
                 Date date = resultSet.getDate("date");
                 String description = resultSet.getString("description");
 
                 Sets sets = new Sets();
+                sets.setSetid(sid);
                 sets.setName(name);
                 sets.setAuthor(author);
                 sets.setDate(date);
@@ -76,6 +77,22 @@ public class SearchRoutes {
                 searchResults.add(sets);
             }
 
+             boolean hasSet = false;
+        if (cookie != null) {
+            String loggedInUserUid = cookie.getValue();
+            String checkSetQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+            PreparedStatement checkSetStatement = connection.prepareStatement(checkSetQuery);
+            checkSetStatement.setString(1, searchKeywords);
+            checkSetStatement.setString(2,loggedInUserUid);
+            ResultSet checkSetResultSet = checkSetStatement.executeQuery();
+            if (checkSetResultSet.next() && checkSetResultSet.getInt(1) > 0) {
+                // The current user is following the searched user
+                hasSet = true;
+            }
+            checkSetResultSet.close();
+            checkSetStatement.close();
+        }
+            model.addAttribute("hasSet", hasSet);
             // Add the flashcard set search results to the model as an attribute.
             model.addAttribute("flashcardSets", searchResults);
         } catch (SQLException e) {
@@ -95,6 +112,74 @@ public class SearchRoutes {
 
         return "searchflashcards"; // Return the same view to display the search results.
     }
+
+    @PostMapping("/addSet")
+    public String addSet(@RequestParam("searched") String searchKeywords, Model model,
+                         @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+        if (cookie != null) {
+            String loggedInUserUid = cookie.getValue();
+            Connection connection = null;
+            PreparedStatement checkStatement = null;
+            PreparedStatement insertStatement = null;
+            try {
+                // Establish a connection to the database
+                connection = Utility.createSQLConnection();
+                
+                // Check if the current user has the set
+                boolean hasSet = true;
+                String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+                checkStatement = connection.prepareStatement(checkQuery);
+                checkStatement.setString(1, loggedInUserUid);
+                checkStatement.setString(2, searchKeywords);
+                ResultSet resultSet = checkStatement.executeQuery();
+    
+                if (resultSet.next() && resultSet.getInt(1) == 0) {
+                    // The current user does not have the set
+                    hasSet = false;
+                }
+    
+                if (hasSet) {
+                    // The current user has the set, so we need to remove it.
+                    String deleteQuery = "DELETE FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+                    insertStatement = connection.prepareStatement(deleteQuery);
+                    insertStatement.setString(1, loggedInUserUid);
+                    insertStatement.setString(2, searchKeywords);
+                    insertStatement.executeUpdate();
+                    hasSet = false; // Update hasSet to false since we removed the set.
+                } else {
+                    // The current user does not have the set, so we need to add it.
+                    String insertQuery = "INSERT INTO UserCreatesSets (uid, sid) VALUES (?, ?)";
+                    insertStatement = connection.prepareStatement(insertQuery);
+                    insertStatement.setString(1, loggedInUserUid);
+                    insertStatement.setString(2, searchKeywords);
+                    insertStatement.executeUpdate();
+                    hasSet = true; // Update hasSet to true since we added the set.
+                }
+    
+                // Update hasSet in the model
+                model.addAttribute("hasSet", hasSet);
+    
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                // Close the statements and connection
+                if (checkStatement != null) {
+                    checkStatement.close();
+                }
+                if (insertStatement != null) {
+                    insertStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
+            }
+        }
+    
+        // Run the searchSets method to display the search results with the updated hasSet status
+        return searchSets(searchKeywords, model, cookie);
+    }
+    
+            
     @PostMapping("/searchusers")
     public String searchUser(@RequestParam("searched") String searchKeywords, Model model,
                              @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
