@@ -30,6 +30,7 @@
                     <label><b>Create Set Description</b></label>
                     <input type="text" placeholder="Enter Description" th:field="*{description}" required>
                     
+                    <input type="hidden" th:name="fid" th:value="${fidVal}" />
                     <button type="submit" class="registerbtn">Submit</button>
                 </div>
         

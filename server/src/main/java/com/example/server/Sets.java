@@ -11,10 +11,19 @@ public class Sets {
     private String author;
     private java.sql.Date date;
     private String description;
+    private String fid;
 
     public Sets(){
         this.sid = Utility.generateRandomId(15);
         this.date = java.sql.Date.valueOf(LocalDate.now());
+    }
+
+    public String getFid(){
+        return this.fid;
+    }
+
+    public void setFid(String fid){
+        this.fid = fid;
     }
 
     public String getSid(){
