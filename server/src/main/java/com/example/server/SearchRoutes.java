@@ -1,6 +1,9 @@
 package com.example.server;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.naming.spi.DirStateFactory.Result;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
@@ -147,4 +150,6 @@ public class SearchRoutes {
 
         return "searchusers"; // Return the same view to display the search results.
     }
+
+
 }

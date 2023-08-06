@@ -17,14 +17,14 @@
             </picture>
         
         <div class="parent-container">
-            <div class="tabBox">
+            <div class="tab">
                 <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
                     <input type="hidden" name="searched" th:value="${searched}">
                     <input type="hidden" name="searchType" value="flashcardSets">
                     <button class="tabBox" type="submit">Flashcard sets</button>
                 </form>
             </div>
-            <div class="tabBox">
+            <div class="tab">
                 <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchusers">
                     <input type="hidden" name="searched" th:value="${searched}">
                     <input type="hidden" name="searchType" value="users">
@@ -36,12 +36,20 @@
             <p th:text="'No users found with the given username: ' + ${searched}"></p>
         </div>
         <div th:if="${not #lists.isEmpty(users)}">
-            <!-- Use Thymeleaf's th:each attribute to iterate through the search results -->
-            <!-- Assuming 'users' is the name of the attribute in the model that contains the search results -->
-            <div th:each="user : ${users}" class = "results-container">
+            <!-- Display the details of each user -->
+            <div th:each="user : ${users}" class="results-container">
                 <!-- Display the details of each user -->
-                <p class="result-name" th:text="'Name: ' + ${user}" ></p>
-                <!-- Add other user attributes as needed -->
+                <p class="result-name" th:text="'Name: ' + ${user}"></p>
+            <!--<p class="following-count" th:text="'Following Count: ' + ${user.value}"></p> -->
+        </div>
+                <!-- follow button -->
+                <div>
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/follow">
+                        <input type="hidden" name="searched" th:value="${searched}">
+                        <input type="hidden" name="searchType" value="follow">
+                        <button  class="follow-button" type="submit">Unfollow</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
