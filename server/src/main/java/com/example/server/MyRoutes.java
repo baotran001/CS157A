@@ -27,9 +27,15 @@ public class MyRoutes {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) throws SQLException{
         // Get User parameters
-        String username = user.getUsername();
+        String username = user.getUsername().trim();
         String password = user.getPassword();
         //System.out.println(uid + " " + email + " " + password);
+
+        // Check if username or password is empty after trimming
+        if (username.isEmpty() || password.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Username or password cannot be empty or contain only spaces.");
+            return "redirect:/quizMeDB/register";
+        }
         
         // Add user to database
          // Establish SQL Connection
