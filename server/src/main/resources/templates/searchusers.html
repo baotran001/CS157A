@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search</title>
+    <link href="../static/css/flashcard.css" rel="stylesheet" type="text/css" th:href="@{/css/flashcard.css}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+</head>
+
+<body>
+    <div th:replace="~{base :: header}"></div>
+    <div th:fragment="content"> 
+        <center>
+            <picture>
+                <img src="https://media.discordapp.net/attachments/1136904785694568530/1137548841906884688/Screenshot_2023-08-05_at_5.52.44_PM.png"
+                    alt="logo" style="width:340px;height:100px;">
+            </picture>
+        </center>
+
+        <div class="tabs">
+            <div class="tabBox">
+                <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                    <input type="hidden" name="searched" th:value="${searched}">
+                    <input type="hidden" name="searchType" value="flashcardSets">
+                    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Flashcard sets</button>
+                </form>
+            </div>
+            <div class="tabBox">
+                <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchusers">
+                    <input type="hidden" name="searched" th:value="${searched}">
+                    <input type="hidden" name="searchType" value="users">
+                    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Users</button>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(users)}">
+            <p th:text="'No users found with the given username: ' + ${searched}"></p>
+        </div>
+        <ul th:if="${not #lists.isEmpty(users)}">
+            <!-- Use Thymeleaf's th:each attribute to iterate through the search results -->
+            <!-- Assuming 'users' is the name of the attribute in the model that contains the search results -->
+            <li th:each="user : ${users}">
+                <!-- Display the details of each user -->
+                <p th:text="'Name: ' + ${user}"></p>
+                <!-- Add other user attributes as needed -->
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

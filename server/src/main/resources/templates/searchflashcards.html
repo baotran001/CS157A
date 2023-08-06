@@ -26,16 +26,16 @@
                 </form>
             </div>
             <div class="tabBox">
-                <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchusers">
                     <input type="hidden" name="searched" th:value="${searched}">
-                    <input type="hidden" name="searchType" value="flashcardSets">
+                    <input type="hidden" name="searchType" value="users">
                     <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Users</button>
                 </form>
             </div>
         </div>
 
         <div th:if="${#lists.isEmpty(flashcardSets)}">
-            <p>No set found with the given name.</p>
+            <p th:text="'No sets found with the given name: ' + ${searched}"></p>
         </div>
         <ul>
             <!-- Use Thymeleaf's th:each attribute to iterate through the search results -->
