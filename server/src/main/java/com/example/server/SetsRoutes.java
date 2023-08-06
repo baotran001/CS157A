@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,11 +21,13 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/quizMeDB")
 public class SetsRoutes {
     @GetMapping("/sets")
-    public String displaySetsPage(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+    public String displaySetsPage(@RequestParam(name = "fid", required = false) String fid,
+                                @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
         model.addAttribute("sets", new Sets());
+        model.addAttribute("fid", fid);
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
         String query = "Select * FROM sets;";
@@ -50,6 +53,7 @@ public class SetsRoutes {
     }
     @PostMapping("/createSets")
     public String createSets(@ModelAttribute("sets") Sets set, RedirectAttributes redirectAttributes,
+                             @RequestParam(name = "fid", required = false) String fid,         
                              @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         
         String uid = cookie.getValue();
@@ -78,14 +82,23 @@ public class SetsRoutes {
             String query1 = "INSERT INTO sets (sid, name, author, date, description) " + "VALUES ('" 
             + sid + "', '" + name + "', '" + author  + "', '" + date + "', '" + description + "');";
             statement.executeUpdate(query1);
-
+          
             String query2 = "INSERT INTO UserCreatesSets (uid, sid) " + "VALUES ('" 
             + uid + "', '" + sid + "');";
             statement.executeUpdate(query2);
+          
+            // Check if the fid parameter is not null, meaning a folder ID is provided in the URL
+            if (fid != null) {
+            // Insert into the FolderHasSets table using the fid and sid
+            String query3 = "INSERT INTO FolderHasSets (fid, sid) " + "VALUES ('" 
+                    + fid + "', '" + sid + "');";
+            statement.executeUpdate(query3);
+        }
             redirectAttributes.addFlashAttribute("success", "Successful Set Creation!");
             return "redirect:/quizMeDB/flashcard?sid=" + sid + "&name=" + name;
         }
         
+
         connection.close();
         redirectAttributes.addFlashAttribute("error", "Set Already Exists!");
         return "redirect:/quizMeDB/sets";
