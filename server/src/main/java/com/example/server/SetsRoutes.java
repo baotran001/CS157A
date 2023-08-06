@@ -61,8 +61,15 @@ public class SetsRoutes {
         String author = set.getAuthor();
         java.sql.Date date = set.getDate();
         String description = set.getDescription();
-        System.out.println(sid + " " + author + " " + name + " " + description + " " + date);
+        //System.out.println(sid + " " + author + " " + name + " " + description + " " + date);
         
+        Connection connection = Utility.createSQLConnection();
+        Statement statement = connection.createStatement();
+        String query = "INSERT INTO sets (sid, name, author, date, description) " + "VALUES ('" 
+        + sid + "', '" + name + "', '" + author  + "', '" + date + "', '" + description + "');";
+        statement.executeUpdate(query);
+        connection.close();
+        redirectAttributes.addFlashAttribute("success", "Success!");
         return "redirect:/quizMeDB/sets";
     }
 }
