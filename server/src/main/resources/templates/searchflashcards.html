@@ -37,17 +37,18 @@
         <div th:if="${#lists.isEmpty(flashcardSets)}">
             <p th:text="'No sets found with the given name: ' + ${searched}"></p>
         </div>
-        <ul>
+        <div th:if="${not #lists.isEmpty(flashcardSets)}">
             <!-- Use Thymeleaf's th:each attribute to iterate through the search results -->
             <!-- Assuming 'flashcardSets' is the name of the attribute in the model that contains the search results -->
-            <li th:each="flashcardSet : ${flashcardSets}">
+            <div th:each="flashcardSet : ${flashcardSets}">
+                <!-- Display the details of each flashcard set -->
                 <p>Set ID: <span th:text="${flashcardSet.sid}"></span></p>
                 <p>Name: <span th:text="${flashcardSet.name}"></span></p>
                 <p>Author: <span th:text="${flashcardSet.author}"></span></p>
                 <p>Date: <span th:text="${flashcardSet.date}"></span></p>
                 <p>Description: <span th:text="${flashcardSet.description}"></span></p>
-            </li>
-        </ul>
+            </div>
+        </div>
     </div>
 </body>
 

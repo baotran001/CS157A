@@ -35,17 +35,17 @@
         </div>
 
         <div th:if="${#lists.isEmpty(users)}">
-            <p th:text="'No users found with the given username: ' + ${searched}"></p>
+            <p th:text="'No users found with the given username ' + ${searched}"></p>
         </div>
-        <ul th:if="${not #lists.isEmpty(users)}">
+        <div th:if="${not #lists.isEmpty(users)}">
             <!-- Use Thymeleaf's th:each attribute to iterate through the search results -->
             <!-- Assuming 'users' is the name of the attribute in the model that contains the search results -->
-            <li th:each="user : ${users}">
+            <div th:each="user : ${users}">
                 <!-- Display the details of each user -->
                 <p th:text="'Name: ' + ${user}"></p>
                 <!-- Add other user attributes as needed -->
-            </li>
-        </ul>
+            </div>
+        </div>
     </div>
 </body>
 </html>
