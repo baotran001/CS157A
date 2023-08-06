@@ -19,7 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/quizMeDB")
 public class FolderRoutes {
-    @GetMapping("/folder")
+    @GetMapping("/createFolder")
     public String displayfolderPage(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
@@ -46,7 +46,7 @@ public class FolderRoutes {
         model.addAttribute("dataList", folderArr);
         return "createfolder";
     }
-    @PostMapping("/createFolder")
+    @PostMapping("/creatingFolder")
     public String createFolder(@ModelAttribute("folder") Folder folder, RedirectAttributes redirectAttributes,
                              @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException{
         
