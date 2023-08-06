@@ -1,37 +1,23 @@
 package com.example.server;
 import java.util.Random;
 import java.util.Objects;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-public class Sets {
-    private String sid;
+public class Folder {
+    private String fid;
     private String name;
     private String author;
-    private java.sql.Date date;
     private String description;
-    private String fid;
 
-    public Sets(){
-        this.sid = Utility.generateRandomId(15);
-        this.date = java.sql.Date.valueOf(LocalDate.now());
+    public Folder(){
+        this.fid = Utility.generateRandomId(15);
     }
 
     public String getFid(){
         return this.fid;
     }
 
-    public void setFid(String fid){
-        this.fid = fid;
-    }
-
-    public String getSid(){
-        return this.sid;
-    }
-
-    public void setSetid(String setid){
-        this.sid = setid;
+    public void setFolderid(String setid){
+        this.fid = setid;
     }
 
     public String getName(){
@@ -50,14 +36,6 @@ public class Sets {
         this.author = author;
     }
 
-    public java.sql.Date getDate(){
-        return this.date;
-    }
-
-    public void setDate(java.sql.Date date){
-        this.date = date;
-    }
-
     public String getDescription(){
         return this.description;
     }
@@ -70,25 +48,24 @@ public class Sets {
     public boolean equals(Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof Sets)) {
+        if (!(o instanceof Folder)) {
             return false;
         }
-        Sets sets = (Sets) o;
-        return Objects.equals(sid, sets.sid) && Objects.equals(name, sets.name) && Objects.equals(author, sets.author) && Objects.equals(date, sets.date) && Objects.equals(description, sets.description);
+        Folder folder = (Folder) o;
+        return Objects.equals(fid, folder.fid) && Objects.equals(name, folder.name) && Objects.equals(author, folder.author) && Objects.equals(description, folder.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sid, name, author, date, description);
+        return Objects.hash(fid, name, author, description);
     }
 
     @Override
     public String toString() {
         return "{" +
-            " sid='" + getSid() + "'" +
+            " fid='" + getFid() + "'" +
             ", name='" + getName() + "'" +
             ", author='" + getAuthor() + "'" +
-            ", date='" + getDate() + "'" +
             ", description='" + getDescription() + "'" +
             "}";
     }
