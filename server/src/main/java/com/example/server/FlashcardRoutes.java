@@ -21,9 +21,11 @@ public class FlashcardRoutes {
 
 
     private String setName;
+    private String sid;
 
     public FlashcardRoutes() {
         this.setName = "";
+        this.sid = "";
     }
 
     public String getSetName(){
@@ -34,6 +36,14 @@ public class FlashcardRoutes {
         this.setName = setName;
     }
 
+    public String getSid(){
+        return this.sid;
+    }
+
+    public void setSid(String sid){
+        this.sid = sid;
+    }
+
     @GetMapping("/flashcard")
     public String displayFlashcardsPage(@RequestParam("sid") String sidValue, 
     @RequestParam("name") String setName, RedirectAttributes redirectAttributes, @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
@@ -41,9 +51,11 @@ public class FlashcardRoutes {
             model.addAttribute("cookieName",cookie.getValue());
         }
         setSetName(setName);
+        setSid(sidValue);
         model.addAttribute("sName", getSetName());
-        model.addAttribute("sidVal", sidValue);
+        model.addAttribute("sidVal", getSid());
         model.addAttribute("flashcard", new FlashCard());
+        model.addAttribute("review", new Review());
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
         String query = 
@@ -71,7 +83,7 @@ public class FlashcardRoutes {
     }
     @PostMapping("/flashcard")
     public String createFlashcard(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model, @ModelAttribute("flashcard") FlashCard flashcard, RedirectAttributes redirectAttributes) throws SQLException{
-        String sidValue = flashcard.getSid();
+        String sidValue = getSid();
         String flashid = flashcard.getFlashid();
         String favorite = flashcard.getFavorite();
         String front = flashcard.getFront();
@@ -87,7 +99,7 @@ public class FlashcardRoutes {
             System.out.println("SQLState:" + E.getSQLState());
             System.out.println("VendorError:" + E.getErrorCode());
             redirectAttributes.addFlashAttribute("errorMessage", "The flashcard already exists!");
-            return "redirect:/quizMeDB/flashcard?sid=" + sidValue; // Redirect to the error page with the error message
+            return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName(); // Redirect to the error page with the error message
         }
         String query = "INSERT INTO flashcards (flashid, favorite, front) " + "VALUES ('" 
         + flashid + "', '" + favorite + "', '" + front  + "');";
@@ -99,6 +111,24 @@ public class FlashcardRoutes {
     
         connection.close();
         redirectAttributes.addFlashAttribute("success", "Success!");
-        return "redirect:/quizMeDB/flashcard?sid=" + sidValue + "&name=" + getSetName();
+        return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
+    }
+
+    @PostMapping("/createReview")
+    public String createFlashcard(RedirectAttributes redirectAttributes, 
+    @ModelAttribute("review") Review review, @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        String rid = review.getRid();
+        int star = review.getStar();
+        String author = cookie.getValue();
+        java.sql.Date date = review.getDate();
+        String text = review.getText();
+
+        Connection connection = Utility.createSQLConnection();
+        Statement statement = connection.createStatement();
+        String query1 = "INSERT INTO Reviews (rid, star, author, date, text) " + "VALUES ('" 
+        + rid + "', " + star + ", '" + author  + "', '" + date + "', '" + text + "');";
+        statement.executeUpdate(query1);
+        redirectAttributes.addFlashAttribute("success", "Review Created!");
+        return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
     }
 }
