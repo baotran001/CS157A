@@ -17,25 +17,23 @@
             </picture>
         
         <div class="parent-container">
-        <div class="button-box">
             <div class="tabBox">
                 <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
                     <input type="hidden" name="searched" th:value="${searched}">
                     <input type="hidden" name="searchType" value="flashcardSets">
-                    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Flashcard sets</button>
+                    <button class="tabBox" type="submit">Flashcard sets</button>
                 </form>
             </div>
             <div class="tabBox">
                 <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchusers">
                     <input type="hidden" name="searched" th:value="${searched}">
                     <input type="hidden" name="searchType" value="users">
-                    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Users</button>
+                    <button class="tabBox" type="submit">Users</button>
                 </form>
             </div>
-        </div>
         <div class="container">
         <div th:if="${#lists.isEmpty(users)}">
-            <p th:text="'No users found with the given username ' + ${searched}"></p>
+            <p th:text="'No users found with the given username: ' + ${searched}"></p>
         </div>
         <div th:if="${not #lists.isEmpty(users)}">
             <!-- Use Thymeleaf's th:each attribute to iterate through the search results -->

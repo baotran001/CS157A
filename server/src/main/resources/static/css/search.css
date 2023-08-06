@@ -4,24 +4,6 @@
     margin-top: 100px; /* Adjust the margin-top to move the container down */
   }
   
-  
-  /* Style for the buttons inside the tab */
-  .button-box button {
-    background-color: #73BA9B;
-    color: white;
-    border: none;
-    cursor: pointer;
-    opacity: 0.9;
-    font-size: 17px;
-  }
-  
-  .tabText{
-    padding-top: 3px;
-    text-align: center;
-    color: rgb(29, 32, 31);
-    font-family: helvetica;
-    font-size: 150;
-  }
  
   .tabBox{
     display: inline-block;
@@ -30,7 +12,9 @@
     border-color: #07754d;
     background-color: #73BA9B;
     width: 150px;
-    height: 50px;
+    height: 55px;
+    font-family: helvetica;
+    font-size: 150;
     
   }
 
