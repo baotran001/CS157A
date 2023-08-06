@@ -16,14 +16,14 @@
                     alt="logo" style="width:340px;height:100px;">
             </picture>
         <div class="parent-container">
-                <div class="tabBox">
+                <div class="tab">
                     <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
                         <input type="hidden" name="searched" th:value="${searched}">
                         <input type="hidden" name="searchType" value="flashcardSets">
                         <button class="tabBox" type="submit">Flashcard sets</button>
                     </form>
                 </div>
-                <div class="tabBox">
+                <div class="tab">
                     <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchusers">
                         <input type="hidden" name="searched" th:value="${searched}">
                         <input type="hidden" name="searchType" value="users">

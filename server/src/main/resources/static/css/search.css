@@ -18,6 +18,21 @@
     
   }
 
+.tab{
+    display: inline-block; 
+}
+  .follow-button {
+    margin: auto;
+    border-radius: 10px 10px 10px 10px;
+    border: 2px solid #095539;
+    border-color: #3f705e;
+    background-color: #a3d7c4;
+    width: 150px;
+    height: 55px;
+    font-family: helvetica;
+    font-size: 150;
+  }
+
   .results-container {
     border: 4px solid  #07754d;
     padding: 10px;
