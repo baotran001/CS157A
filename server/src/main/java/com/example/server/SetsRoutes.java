@@ -117,22 +117,26 @@ public class SetsRoutes {
         //System.out.println(count);
         if (count == 0){
             //System.out.println(sid);
+
+            //insert into sets
             String query1 = "INSERT INTO sets (sid, name, author, date, description) " + "VALUES ('" 
             + sid + "', '" + name + "', '" + author  + "', '" + date + "', '" + description + "');";
             statement.executeUpdate(query1);
           
+            //insert into user creates sets
             String query2 = "INSERT INTO UserCreatesSets (uid, sid) " + "VALUES ('" 
             + uid + "', '" + sid + "');";
             statement.executeUpdate(query2);
           
             // Check if the fid parameter is not null, meaning a folder ID is provided in the URL
             if (fidValue != null) {
-
+                
+                //not valid id like blank id means there is no folder
                 if (!isValidFid(fid)) {
                     redirectAttributes.addFlashAttribute("error", "Invalid Folder ID (fid)");
                     return "redirect:/quizMeDB/flashcard?sid=" + sid + "&name=" + name;
                 }
-
+                
                 // Insert into the FolderHasSets table using the fid and sid
                 String query3 = "INSERT INTO FolderHasSets (fid, sid) " + "VALUES ('" 
                 + fidValue + "', '" + sid + "');";

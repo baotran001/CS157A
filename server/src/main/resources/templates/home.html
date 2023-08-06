@@ -9,8 +9,6 @@
     <div th:replace="~{base :: header}"></div>
     <div th:fragment="content"> 
         <div th:if="${cookieName}">
-            <p style="font-size: 24; text-align: right;">Logged In As <span th:text="${cookieName}"></span></p>
-            <a href="/quizMeDB/logout">Logout</a>
             <h1 style="text-align: center;" >View Flashcard Collection</h1>
             
             <!-- Checking if user has a folder -->

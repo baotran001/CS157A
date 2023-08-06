@@ -24,30 +24,28 @@
                 <div th:if="${cookieName == null}">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{url_for('login')}}">Login</a>
+                            <a class="nav-link" href="/quizMeDB/login">Login</a>
                         </li>
               
                         <li class="nav-item">
-                            <a class="nav-link" href="{{url_for('signup')}}">Sign Up</a>
+                            <a class="nav-link" href="/quizMeDB/register">Sign Up</a>
                         </li>
                     </ul>
                 </div>
                 <div th:if="${cookieName}">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="">Collection</a>
+                            <a class="nav-link" href="/quizMeDB/home">Collection</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Account
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="/quizMeDB/logout">Logout</a>
-                            </div>
+                            <a class="nav-link" href="/quizMeDB/logout">Logout</a>
                         </li>
+
+                        <p style="text-align: right;">Logged In As <span th:text="${cookieName}"></span></p>
+
                     </ul>
                 </div>
             </ul>
+
         </div>
           </ul>
             <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
