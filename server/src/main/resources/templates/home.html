@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
-    <div th:replace="base :: header"></div>
+    <div th:replace="~{base :: header}"></div>
     <div th:fragment="content"> 
         <div th:if="${cookieName}">
             <p style="font-size: 24; text-align: right;">Logged In As <span th:text="${cookieName}"></span></p>
