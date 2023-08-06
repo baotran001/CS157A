@@ -33,7 +33,7 @@
                 </div>
                 <div class="container">
                     <div th:if="${noUsersFound}">
-                        <p th:text="'No users found with the given username: ' + ${searched}"></p>
+                              <p th:text="'No users found with the given username: ' + ${searched}"></p>
                     </div>
                     <div th:if="${not #lists.isEmpty(users)}">
                         <!-- Display the details of each user -->

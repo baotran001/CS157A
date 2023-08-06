@@ -95,63 +95,63 @@ public class SearchRoutes {
 
         return "searchflashcards"; // Return the same view to display the search results.
     }
-   @PostMapping("/searchusers")
-public String searchUser(@RequestParam("searched") String searchKeywords, Model model,
-                         @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
-    if (cookie != null) {
-        model.addAttribute("cookieName", cookie.getValue());
-    }
-
-    // Check if searchKeywords is null or empty, and provide a default value if necessary
-    String searchQuery = (searchKeywords != null && !searchKeywords.isEmpty()) ? searchKeywords : "Not specified";
-    Connection connection = null;
-    PreparedStatement statement = null;
-    ResultSet resultSet = null;
-    Map<String, Integer> searchResults = new HashMap<>(); // Using a HashMap to store name and following count.
-
-    try {
-        // Establish a connection to the database
-        connection = Utility.createSQLConnection();
-
-        // Prepare the SQL query to search for users by name
-        String query = "SELECT uid FROM Users WHERE uid = ?";
-        statement = connection.prepareStatement(query);
-
-        // Set the searchKeywords as the parameter in the query
-        statement.setString(1, searchKeywords);
-
-        // Execute the query and get the result set
-        resultSet = statement.executeQuery();
-
-        // Process the search results and add user names and following count to the searchResults HashMap
-        while (resultSet.next()) {
-            String uid = resultSet.getString("uid");
-
-            // Now, execute the following count query for this user
-            String followingCountQuery = "SELECT COUNT(fid) AS followingCount FROM UserHasFollowingList WHERE uid = ?";
-            PreparedStatement followingCountStatement = connection.prepareStatement(followingCountQuery);
-            followingCountStatement.setString(1, uid);
-            ResultSet followingCountResultSet = followingCountStatement.executeQuery();
-
-            // Process the following count and add the user and following count to the searchResults HashMap
-            if (followingCountResultSet.next()) {
-                int followingCount = followingCountResultSet.getInt("followingCount");
-                searchResults.put(uid, followingCount);
-            }
-
-            // Close the following count result set and statement
-            followingCountResultSet.close();
-            followingCountStatement.close();
+    @PostMapping("/searchusers")
+    public String searchUser(@RequestParam("searched") String searchKeywords, Model model,
+                             @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+        if (cookie != null) {
+            model.addAttribute("cookieName", cookie.getValue());
         }
-
-        // Check if the current user is following the searched user
-        boolean isFollowing = false;
+    
+        // Check if searchKeywords is null or empty, and provide a default value if necessary
+        String searchQuery = (searchKeywords != null && !searchKeywords.isEmpty()) ? searchKeywords : "Not specified";
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        Map<String, Integer> searchResults = new HashMap<>(); // Using a HashMap to store name and following count.
+    
+        try {
+            // Establish a connection to the database
+            connection = Utility.createSQLConnection();
+    
+            // Prepare the SQL query to search for users by name
+            String query = "SELECT uid FROM Users WHERE uid = ?";
+            statement = connection.prepareStatement(query);
+    
+            // Set the searchKeywords as the parameter in the query
+            statement.setString(1, searchKeywords);
+    
+            // Execute the query and get the result set
+            resultSet = statement.executeQuery();
+    
+            // Process the search results and add user names and following count to the searchResults HashMap
+            while (resultSet.next()) {
+                String uid = resultSet.getString("uid");
+    
+                // Now, execute the following count query for this user
+                String followingCountQuery = "SELECT COUNT(fid) AS followingCount FROM UserHasFollowingList WHERE uid = ?";
+                PreparedStatement followingCountStatement = connection.prepareStatement(followingCountQuery);
+                followingCountStatement.setString(1, uid);
+                ResultSet followingCountResultSet = followingCountStatement.executeQuery();
+    
+                // Process the following count and add the user and following count to the searchResults HashMap
+                if (followingCountResultSet.next()) {
+                    int followingCount = followingCountResultSet.getInt("followingCount");
+                    searchResults.put(uid, followingCount);
+                }
+    
+                // Close the following count result set and statement
+                followingCountResultSet.close();
+                followingCountStatement.close();
+            }
+    
+            // Check if the current user is following the searched user
+            boolean isFollowing = false;
         if (cookie != null) {
             String loggedInUserUid = cookie.getValue();
             String checkFollowingQuery = "SELECT COUNT(*) FROM UserHasFollowingList WHERE uid = ? AND fid = ?";
             PreparedStatement checkFollowingStatement = connection.prepareStatement(checkFollowingQuery);
-            checkFollowingStatement.setString(1, loggedInUserUid);
-            checkFollowingStatement.setString(2, searchKeywords);
+            checkFollowingStatement.setString(1, searchKeywords);
+            checkFollowingStatement.setString(2, loggedInUserUid);
             ResultSet checkFollowingResultSet = checkFollowingStatement.executeQuery();
             if (checkFollowingResultSet.next() && checkFollowingResultSet.getInt(1) > 0) {
                 // The current user is following the searched user
@@ -160,96 +160,129 @@ public String searchUser(@RequestParam("searched") String searchKeywords, Model 
             checkFollowingResultSet.close();
             checkFollowingStatement.close();
         }
-
-        // Add the user search results and the isFollowing flag to the model
-        model.addAttribute("users", searchResults);
-        model.addAttribute("searched", searchQuery);
-        model.addAttribute("isFollowing", isFollowing);
-        boolean noUsersFound = searchResults.isEmpty();
-        model.addAttribute("noUsersFound", noUsersFound);
-    } catch (SQLException e) {
-        e.printStackTrace();
-    } finally {
-        // Close the result set, statement, and connection
-        if (resultSet != null) {
-            resultSet.close();
+    
+            // Add the user search results and the isFollowing flag to the model
+            model.addAttribute("users", searchResults);
+            model.addAttribute("searched", searchQuery);
+            System.out.println("isfollowing in search:" + isFollowing);
+            model.addAttribute("isFollowing", isFollowing);
+            boolean noUsersFound = searchResults.isEmpty();
+            model.addAttribute("noUsersFound", noUsersFound);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the result set, statement, and connection
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
         }
-        if (statement != null) {
-            statement.close();
-        }
-        if (connection != null) {
-            connection.close();
-        }
+    
+        return "searchusers"; // Return the same view to display the search results.
     }
+    @PostMapping("/follow")
+    public String follow(@RequestParam("searched") String searchKeywords, Model model,
+                         @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+        if (cookie != null) {
+            String loggedInUserUid = cookie.getValue(); // Get the UID of the logged-in user from the cookie.
+            //System.out.println("Search user method called with searchKeywords: " + searchKeywords);
+            //System.out.println("loggedInUserUid: " + loggedInUserUid);
+            if (searchKeywords != null && !searchKeywords.isEmpty() && !searchKeywords.equals(loggedInUserUid)) {
+                Connection connection = null;
+                PreparedStatement checkStatement = null;
+                PreparedStatement insertStatement = null;
+                PreparedStatement unfollowStatement = null;
+                PreparedStatement followStatement = null;
+    
+                try {
+                    // Establish a connection to the database
+                    connection = Utility.createSQLConnection();
+    
+                    // Check if the current user is following the searched user
+                    boolean isFollowing = true;
+                    // Prepare the SQL query to check if the follower-following relationship already exists
+                    String checkQuery = "SELECT COUNT(*) FROM UserHasFollowingList WHERE uid = ? AND fid = ?";
+                    checkStatement = connection.prepareStatement(checkQuery);
 
-    return "searchusers"; // Return the same view to display the search results.
-}
-@PostMapping("/follow")
-public String follow(@RequestParam("searched") String searchKeywords, Model model,
-                     @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
-    if (cookie != null) {
-        String loggedInUserUid = cookie.getValue(); // Get the UID of the logged-in user from the cookie.
+                    // Set the logged-in user's UID as the parameter for the first ? in the check query
+                    checkStatement.setString(1, searchKeywords);
 
-        if (searchKeywords != null && !searchKeywords.isEmpty() && !searchKeywords.equals(loggedInUserUid)) {
-            Connection connection = null;
-            PreparedStatement checkStatement = null;
-            PreparedStatement insertStatement = null;
+                    // Set the user to be followed (searched user's UID) as the parameter for the second ? in the check query
+                    checkStatement.setString(2, loggedInUserUid);
 
-            try {
-                // Establish a connection to the database
-                connection = Utility.createSQLConnection();
+                    // Execute the check query to see if the relationship already exists
+                    ResultSet resultSet = checkStatement.executeQuery();;
+                    if (resultSet.next() && resultSet.getInt(1) == 0) {
+                        // The current user is following the searched user
+                        isFollowing = false;
+                    }
+    
+                    if (isFollowing) {
+                        //System.out.println("UnFollow method called!");
+                        // The current user is following the searched user, so we need to unfollow them.
+                        String unfollowQuery = "DELETE FROM UserHasFollowingList WHERE uid = ? AND fid = ?";
+                        unfollowStatement = connection.prepareStatement(unfollowQuery);
 
-                // Prepare the SQL query to check if the follower-following relationship already exists
-                String checkQuery = "SELECT COUNT(*) FROM UserHasFollowingList WHERE uid = ? AND fid = ?";
-                checkStatement = connection.prepareStatement(checkQuery);
+                        // Set the logged-in user's UID as the parameter for the first ? in the insert query
+                        unfollowStatement.setString(1, searchKeywords);
 
-                // Set the logged-in user's UID as the parameter for the first ? in the check query
-                checkStatement.setString(1, searchKeywords);
+                        // Set the user to be followed (searched user's UID) as the parameter for the second ? in the insert query
+                        unfollowStatement.setString(2, loggedInUserUid);
 
-                // Set the user to be followed (searched user's UID) as the parameter for the second ? in the check query
-                checkStatement.setString(2, loggedInUserUid);
+                        // Execute the insert query to add the follower-following relationship
+                        unfollowStatement.executeUpdate();
+    
+                        // Update isFollowing to false since we just unfollowed the user
+                        isFollowing = false;
+                    } else {
+                        //System.out.println("Follow method called!");
+                        // The current user is not following the searched user, so we need to follow them.
+                        String followQuery = "INSERT INTO UserHasFollowingList (uid, fid) VALUES (?, ?)";
+                        followStatement = connection.prepareStatement(followQuery);
 
-                // Execute the check query to see if the relationship already exists
-                ResultSet resultSet = checkStatement.executeQuery();
+                        // Set the logged-in user's UID as the parameter for the first ? in the insert query
+                        followStatement.setString(1, searchKeywords);
 
-                // Check the result to see if the relationship already exists
-                if (resultSet.next() && resultSet.getInt(1) == 0) {
-                    // Prepare the SQL query to add the follower-following relationship
-                    String insertQuery = "INSERT INTO UserHasFollowingList (uid, fid) VALUES (?, ?)";
-                    insertStatement = connection.prepareStatement(insertQuery);
+                        // Set the user to be followed (searched user's UID) as the parameter for the second ? in the insert query
+                        followStatement.setString(2, loggedInUserUid);
 
-                    // Set the logged-in user's UID as the parameter for the first ? in the insert query
-                    insertStatement.setString(1, searchKeywords);
-
-                    // Set the user to be followed (searched user's UID) as the parameter for the second ? in the insert query
-                    insertStatement.setString(2, loggedInUserUid);
-
-                    // Execute the insert query to add the follower-following relationship
-                    insertStatement.executeUpdate();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                // Close the statements and connection
-                if (checkStatement != null) {
-                    checkStatement.close();
-                }
-                if (insertStatement != null) {
-                    insertStatement.close();
-                }
-                if (connection != null) {
-                    connection.close();
+                        // Execute the insert query to add the follower-following relationship
+                        followStatement.executeUpdate();
+    
+                        // Update isFollowing to true since we just followed the user
+                        isFollowing = true;
+                    }
+    
+                    // Update isFollowing in the model
+                    model.addAttribute("isFollowing", isFollowing);
+                    //System.out.println("Is following: " + isFollowing);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    // Close the statements and connection
+                    if (checkStatement != null) {
+                        checkStatement.close();
+                    }
+                    if (insertStatement != null) {
+                        insertStatement.close();
+                    }
+                    if (connection != null) {
+                        connection.close();
+                    }
                 }
             }
         }
-    }
-
-    // Add the searchKeywords to the model to be used in the searchUser method
-    model.addAttribute("searched", searchKeywords);
-
-    // Run the searchUser method to display the search results with the updated following count
-    return searchUser(searchKeywords, model, cookie);
-}
-
     
+        // Add the searchKeywords to the model to be used in the searchUser method
+        model.addAttribute("searched", searchKeywords);
+    
+        // Run the searchUser method to display the search results with the updated following count
+        return searchUser(searchKeywords, model, cookie);
+    }
+             
 }
