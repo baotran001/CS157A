@@ -15,7 +15,7 @@
                     alt="logo" style="width:340px;height:100px;">
             </picture>
         </center>
-        <div th:if="${#lists.isEmpty(searchResults)}">
+        <div th:if="${#lists.isEmpty(flashcardSets)}">
             <p>No set found with the given name.</p>
         </div>
         <ul>
