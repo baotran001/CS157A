@@ -52,10 +52,9 @@ public class SetsRoutes {
     public String createSets(@ModelAttribute("sets") Sets set, RedirectAttributes redirectAttributes,
                              @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException{
         
-        if (cookie != null) {
-            String uid = cookie.getValue();
-            set.setAuthor(uid); // Set the user's uid as the author
-        }
+        String uid = cookie.getValue();
+        set.setAuthor(uid); // Set the user's uid as the author
+        
         String sid = set.getSid();
         String name = set.getName();
         String author = set.getAuthor();
@@ -65,11 +64,16 @@ public class SetsRoutes {
         
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
-        String query = "INSERT INTO sets (sid, name, author, date, description) " + "VALUES ('" 
+        String query1 = "INSERT INTO sets (sid, name, author, date, description) " + "VALUES ('" 
         + sid + "', '" + name + "', '" + author  + "', '" + date + "', '" + description + "');";
-        statement.executeUpdate(query);
+        statement.executeUpdate(query1);
+
+        String query2 = "INSERT INTO UserCreatesSets (uid, sid) " + "VALUES ('" 
+        + uid + "', '" + sid + "');";
+        statement.executeUpdate(query2);
+
         connection.close();
-        redirectAttributes.addFlashAttribute("success", "Success!");
-        return "redirect:/quizMeDB/sets";
+        redirectAttributes.addFlashAttribute("success", "Successful Set Creation!");
+        return "redirect:/quizMeDB/flashcard?sid=" + sid;
     }
 }
