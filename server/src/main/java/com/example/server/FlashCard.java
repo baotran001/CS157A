@@ -7,10 +7,19 @@ public class FlashCard {
     private String favorite;
     private String front;
     private String back;
+    private String sid;
 
     public FlashCard() {
         this.flashid = Utility.generateRandomId(15);
         this.favorite = "N";
+    }
+
+    public String getSid(){
+        return this.sid;
+    }
+
+    public void setSid(String sid){
+        this.sid = sid;
     }
 
     public String getFlashid() {

@@ -18,6 +18,11 @@
                 <div th:if="${success}">
                     <p th:text="${success}"></p>
                 </div>
+
+                <div th:if="${error}">
+                    <p th:text="${error}"></p>
+                </div>
+
                 <div class="container">
                     <label><b>Create Set Name</b></label>
                     <input type="text" placeholder="Enter Set Name" th:field="*{name}" required>

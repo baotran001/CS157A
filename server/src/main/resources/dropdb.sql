@@ -1,20 +1,19 @@
 USE quizmedb;
-
 DROP TABLE UserHasFollowingList;
 DROP TABLE CommentsHasLikesList;
 DROP TABLE ReviewsHasComments;
 DROP TABLE ReviewsHasLikesList;
 DROP TABLE UserWritesReviews;
 DROP TABLE SetsHasReviews;
-DROP TABLE Reviews;
 DROP TABLE SetHasFlashcards;
-DROP TABLE FrontHasBack;
-DROP TABLE Flashcards;
 DROP TABLE SetHasTag;
-DROP TABLE Tag;
+DROP TABLE UsersCreatesFolder;
 DROP TABLE FolderHasSets;
+DROP TABLE Reviews;
+DROP TABLE Flashcards;
+DROP TABLE Tag;
 DROP TABLE UserCreatesSets;
 DROP TABLE Sets;
-DROP TABLE UsersCreatesFolder;
 DROP TABLE Folder;
 DROP TABLE Users;
+DROP TABLE FrontHasBack;
