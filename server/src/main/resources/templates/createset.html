@@ -3,9 +3,11 @@
 <head>
     <title>Create Set</title>
     <link href="../static/css/flashcard.css" rel="stylesheet" type="text/css" th:href="@{/css/flashcard.css}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
-    <!--div th:replace = "~{base.html :: content}"--> 
+    <div th:replace="~{base :: header}"></div>
+    <div th:fragment="content"> 
         <div th:if="${cookieName}">
             <p style="font-size: 24; text-align: right;">Logged In As <span th:text="${cookieName}"></span></p>
             <a href="/quizMeDB/logout">Logout</a>
@@ -34,5 +36,6 @@
             <a href="/quizMeDB/login">Sign in</a>
         </div>
     <!-- You can display a success message or redirect the user to another page -->
+    </div>
 </body>
 </html>
