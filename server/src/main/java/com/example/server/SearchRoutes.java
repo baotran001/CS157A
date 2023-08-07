@@ -36,6 +36,7 @@ public class SearchRoutes {
                             @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
        
         System.out.println("Searched: " + searchKeywords);
+         System.out.println("Ssearxhed TAG: " + setTag);
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
@@ -73,12 +74,29 @@ public class SearchRoutes {
                     Date date = resultSet.getDate("date");
                     String description = resultSet.getString("description");
 
+                 //DELETE THIS so it works
+                    String tagquery = "SELECT t.tid, t.tag_name FROM Tag t " +
+                    "INNER JOIN SetHasTag st ON t.tid = st.tid " +
+                    "WHERE st.sid = ?";
+                    
+                    PreparedStatement tagstatement = connection.prepareStatement(tagquery);
+                    tagstatement.setString(1, sid);
+                    String tag = resultSet.getString("tag_name");
+                    System.out.println(tag);
+                //DELETE
+
+  
                     Sets sets = new Sets();
                     sets.setSetid(sid);
                     sets.setName(name);
                     sets.setAuthor(author);
                     sets.setDate(date);
                     sets.setDescription(description);
+                     sets.setTag(tag);
+
+                    ///DELETE THIS 
+                     sets.setTag(tag);
+                     //DELETE
 
                     searchResults.add(sets);
                     model.addAttribute("flashcardSets", searchResults);
@@ -133,6 +151,9 @@ public class SearchRoutes {
                                 String author = resultSet.getString("author");
                                 Date date = resultSet.getDate("date");
                                 String description = resultSet.getString("description");
+
+
+                                
 
                                 Sets sets = new Sets();
                                 sets.setSetid(sid);
@@ -236,7 +257,7 @@ public class SearchRoutes {
                 }
                   
 
-                     System.out.println("INSIDE SeT remove");
+                
                 } else {
                     // The current user does not have the set, so we need to add it.
                     String insertQuery = "INSERT INTO UserCreatesSets (uid, sid) VALUES (?, ?)";
@@ -246,21 +267,12 @@ public class SearchRoutes {
                     insertStatement.executeUpdate();
                     hasSet = true;// Update hasSet to true since we added the set.
 
-                    System.out.println("INSIDE SeT INSERT");
                 }
                 
                 //FINDing the tag name 
                 // Update hasSet in the model
 
-                String tagQuery = "SELECT t.tag_name FROM Tag t " +
-                  "JOIN SetHasTag sht ON t.tid = sht.tid " +
-                  "WHERE sht.sid = ?";
-                PreparedStatement tagStatement = connection.prepareStatement(tagQuery);
-                tagStatement.setString(1, searchKeywords);
-                ResultSet tagResultSet = tagStatement.executeQuery();
-                if (tagResultSet.next()) {
-                    setTag = tagResultSet.getString("tag_name");
-}
+            
                 model.addAttribute("hasSet", hasSet);
 
                 System.out.println("Do they have set:" + hasSet);
@@ -283,6 +295,7 @@ public class SearchRoutes {
 
         
         // Run the searchSets method to display the search results with the updated hasSet status
+        System.out.println("SET TAG IS :       " + setTag);
         return searchSets(setName, model, setTag, cookie);
         //"redirect:/quizMeDB/searchflashcards"
     }

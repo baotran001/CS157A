@@ -82,12 +82,14 @@
                         <p>Author: <span th:text="${flashcardSet.author}"></span></p>
                         <p>Date: <span th:text="${flashcardSet.date}"></span></p>
                         <p>Description: <span th:text="${flashcardSet.description}"></span></p>
+                        <p>Description: <span th:text="${flashcardSet.tag}"></span></p>
                         <p>hasSet value: <span th:text="${hasSet}"></span></p>
                         <div>
                             <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/addSet">
                                 <input type="hidden" name="searched" th:value="${flashcardSet.sid}">
                                 <input type="hidden" name="setName" th:value="${searched}">
                                 <input type="hidden" name="setAuthor" th:value="${flashcardSet.author}">
+                                <input type="hidden" name="setTag" th:value="${setTag}">
                                 <input type="hidden" name="searchType" value="set">
                                 <button class="follow-button" type="submit" th:text="${hasSet ? 'Remove Set' : 'Add Set'}"></button>
                             </form>
