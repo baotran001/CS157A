@@ -40,7 +40,12 @@
                             <a class="nav-link" href="/quizMeDB/logout">Logout</a>
                         </li>
 
-                        <p style="text-align: right;">Logged In As <span th:text="${cookieName}"></span></p>
+                        
+                        <li class="nav-item">
+                          <span class="nav-link">
+                              Logged In As <strong th:text="${cookieName}"></strong>
+                          </span>
+                      </li>
 
                     </ul>
                 </div>
