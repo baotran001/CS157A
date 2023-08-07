@@ -14,7 +14,10 @@
                     card.classList.toggle('flipped');
                     
                     // Toggle content visibility
-                    const frontContent = card.querySelector('.card-content-front');
+                    
+                    /**
+                     * 
+                     * const frontContent = card.querySelector('.card-content-front');
                     const backContent = card.querySelector('.card-content-back');
                     
                     if (card.classList.contains('flipped')) {
@@ -24,6 +27,7 @@
                         frontContent.style.display = 'block';
                         backContent.style.display = 'none';
                     }
+                     **/
                 });
             });
         });
@@ -57,11 +61,16 @@
             </div>
         
         </form>
-        <h1 style="margin-top: 20px; text-align: center;" >View Flashcards</h1>
+        <h1 style="margin-top: 20px; text-align: center;" >Flashcards</h1>
         <div class="card-container">
             <div class="card" th:each="item : ${dataList}">
                 <div class="card-content-front">
                     <h2>Front</h2>
+                    <span>
+                        <form action="#"  method="post">
+                            <input type="checkbox"/>
+                        </form>
+                    </span>
                     <p th:text="${item.getFront()}"></p>
                 </div>
                 <div class="card-content-back">
@@ -98,7 +107,7 @@
             <button type="submit" class="registerbtn">Submit</button>
             </div>
         </form>
-        <h1 style="margin-top: 20px; text-align: center;" >View Flashcards</h1>
+        <h1 style="margin-top: 20px; text-align: center;" >Reviews</h1>
         <div class="container" style="margin-bottom: 10px;"th:each="item : ${reviewList}">
             <h4>Rating</h4>
             <div th:if="${item.getStar() == 0}">
@@ -151,8 +160,22 @@
         
             <p></p>
             <span><b>Date: </b></span> <span th:text="${item.getDate()}"></span>
-            <span><b>Author: </b></span>: <span th:text="${item.getAuthor()}"></span><hr/>
+            <span><b>Author: </b></span>: <span th:text="${item.getAuthor()}"></span><br/>
             <span><b>Comment: </b></span> <span th:text="${item.getText()}"></span>
+            <h3 style="margin-top: 20px; text-align: center;" >Replies</h3><hr/>
+            <div style="margin-bottom: 10px;"th:each="comment : ${item.getComments()}">
+                <span><b>Date: </b></span> <span th:text="${comment.getDate()}"></span>
+                <span><b>Author: </b></span> <span th:text="${comment.getAuthor()}"></span><br/>
+                <span><b>Comment: </b></span> <span th:text="${comment.getText()}"></span><hr/>
+            </div>
+            <form action="#" th:action="@{/quizMeDB/createComment}" th:object="${comment}" method="post">
+                <label><b>Add a comment</b></label>
+                <input type="text" placeholder="Write your Comment here" th:field="*{text}" required>
+                <input type="hidden" name="ridField" th:value="${item.getRid()}"/>
+                <button type="submit" class="registerbtn" style="
+                    width: 200px;
+                ">Submit Comment</button>
+            </form>
         </div>
     </div>
     <div th:if="${cookieName == null}">

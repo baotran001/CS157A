@@ -93,10 +93,6 @@ body {
     font-size: 25px;
 }
 
-.card:hover{
-  background-color:#04AA6D
-}
-
 .card-content-back{
   display: none;
 }

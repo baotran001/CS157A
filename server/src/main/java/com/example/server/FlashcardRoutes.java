@@ -1,6 +1,6 @@
 package com.example.server;
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.*;
 import javax.naming.spi.DirStateFactory.Result;
 
 import org.springframework.stereotype.Controller;
@@ -49,56 +49,61 @@ public class FlashcardRoutes {
     @RequestParam("name") String setName, RedirectAttributes redirectAttributes, @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
-        }
-        setSetName(setName);
-        setSid(sidValue);
-        model.addAttribute("sName", getSetName());
-        model.addAttribute("sidVal", getSid());
-        model.addAttribute("flashcard", new FlashCard());
-        model.addAttribute("review", new Review());
-        Connection connection = Utility.createSQLConnection();
-        Statement statement = connection.createStatement();
-        String query = 
-        "Select DISTINCT F.flashid, F.favorite, F.front, FB.back FROM flashcards F, FrontHasBack FB" +
-        ", sethasflashcards SF WHERE F.front = FB.front AND F.flashid = SF.flashid AND " + "SF.sid = '" + sidValue + "';";
-        ResultSet res = statement.executeQuery(query);
-        ArrayList<FlashCard> flashcArr = new ArrayList<>();
-        while (res.next()) {
-            String flashid = res.getString("flashid");
-            String favorite = res.getString("favorite");
-            String front = res.getString("front");
-            String back = res.getString("back");
+            setSetName(setName);
+            setSid(sidValue);
+            model.addAttribute("sName", getSetName());
+            model.addAttribute("sidVal", getSid());
+            model.addAttribute("flashcard", new FlashCard());
+            model.addAttribute("review", new Review());
+            model.addAttribute("comment", new Comment());
+            Connection connection = Utility.createSQLConnection();
+            Statement statement = connection.createStatement();
+            String query = 
+            "Select DISTINCT F.flashid, F.favorite, F.front, FB.back FROM flashcards F, FrontHasBack FB" +
+            ", sethasflashcards SF WHERE F.front = FB.front AND F.flashid = SF.flashid AND " + "SF.sid = '" + sidValue + "';";
+            ResultSet res = statement.executeQuery(query);
+            HashSet<FlashCard> flashcArr = new HashSet<>();
+            while (res.next()) {
+                FlashCard flashc = new FlashCard();
+                flashc.setFlashid(res.getString("flashid"));
+                flashc.setFavorite(res.getString("favorite"));
+                flashc.setFront(res.getString("front"));
+                flashc.setBack(res.getString("back"));
+                flashcArr.add(flashc);
+            }
+            model.addAttribute("dataList", flashcArr);
 
-            FlashCard flashc = new FlashCard();
-            flashc.setFlashid(flashid);
-            flashc.setFavorite(favorite);
-            flashc.setFront(front);
-            flashc.setBack(back);
-            flashcArr.add(flashc);
+            String query1 = "SELECT DISTINCT R.rid, R.star, R.author, R.date, R.text FROM Reviews R, setshasreviews SR, userwritesreviews UR " + 
+            "WHERE R.rid = SR.rid AND R.rid = UR.rid AND SR.sid = '" + getSid() + "' AND UR.uid = '" + cookie.getValue() + "';";
+            ResultSet res1 = statement.executeQuery(query1);
+            ArrayList<Review> reviewArr = new ArrayList<>();
+            while (res1.next()) {
+                Review review = new Review();
+                review.setRid(res1.getString("rid"));
+                review.setStar(res1.getInt("star"));
+                review.setAuthor(res1.getString("author"));
+                review.setDate(res1.getDate("date"));
+                review.setText(res1.getString("text"));
+                reviewArr.add(review);
+            }
+            model.addAttribute("reviewList", reviewArr);
+            for(Review review: reviewArr){
+                String query2 = "SELECT RHC.rid, RHC.cid," +
+                "RHC.date, RHC.author, RHC.text FROM reviewshascomments RHC, Reviews R " + 
+                "WHERE R.rid = RHC.rid AND R.rid = '" + review.getRid() + "';";
+                ResultSet res2 = statement.executeQuery(query2);
+                while(res2.next()){
+                    Comment comment = new Comment();
+                    comment.setCid(res2.getString("cid"));
+                    comment.setAuthor(res2.getString("author"));
+                    comment.setDate(res2.getDate("date"));
+                    comment.setText(res2.getString("text"));
+                    review.addComment(comment);
+                }
         }
-        model.addAttribute("dataList", flashcArr);
 
-        String query1 = "SELECT DISTINCT R.rid, R.star, R.author, R.date, R.text FROM Reviews R, setshasreviews SR, userwritesreviews UR " + 
-        "WHERE R.rid = SR.rid AND R.rid = UR.rid AND SR.sid = '" + getSid() + "' AND UR.uid = '" + cookie.getValue() + "';";
-        ResultSet res1 = statement.executeQuery(query1);
-        ArrayList<Review> reviewArr = new ArrayList<>();
-        while (res1.next()) {
-            String rid = res1.getString("rid");
-            int star = res1.getInt("star");
-            String author = res1.getString("author");
-            java.sql.Date date = res1.getDate("date");
-            String text = res1.getString("text");
-
-            Review review = new Review();
-            review.setRid(rid);
-            review.setStar(star);
-            review.setAuthor(author);
-            review.setDate(date);
-            review.setText(text);
-            reviewArr.add(review);
-        }
-        model.addAttribute("reviewList", reviewArr);
         connection.close();
+        }
         return "flashcard";
     }
     @PostMapping("/flashcard")
@@ -135,7 +140,7 @@ public class FlashcardRoutes {
     }
 
     @PostMapping("/createReview")
-    public String createFlashcard(RedirectAttributes redirectAttributes, 
+    public String createReview(RedirectAttributes redirectAttributes, 
     @ModelAttribute("review") Review review, @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         String rid = review.getRid();
         int star = review.getStar();
@@ -156,8 +161,28 @@ public class FlashcardRoutes {
         String query3 = "INSERT INTO userwritesreviews (uid, rid) " + "VALUES ('" +
         cookie.getValue() + "', '" + rid + "');";
         statement.executeUpdate(query3);
-
+        connection.close();
         redirectAttributes.addFlashAttribute("success", "Review Created!");
+        return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
+    }
+
+    @PostMapping("/createComment")
+    public String createComment(RedirectAttributes redirectAttributes, 
+    @ModelAttribute("comment") Comment comment, @RequestParam("ridField") String ridValue,
+    @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        String rid = ridValue;
+        String cid = comment.getCid();
+        String author = cookie.getValue();
+        java.sql.Date date = comment.getDate();
+        String text = comment.getText();
+
+        Connection connection = Utility.createSQLConnection();
+        Statement statement = connection.createStatement();
+        String query1 = "INSERT INTO reviewshascomments (rid, cid, date, author, text) " + "VALUES ('" 
+        + rid + "', '" + cid + "', '" + date  + "', '" + author + "', '" + text + "');";
+        statement.executeUpdate(query1);
+
+        connection.close();
         return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
     }
 }
