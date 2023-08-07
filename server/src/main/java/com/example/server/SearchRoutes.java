@@ -34,9 +34,8 @@ public class SearchRoutes {
     @PostMapping("/searchflashcards")
     public String searchSets(@RequestParam("searched") String searchKeywords , Model model, @RequestParam("setTag") String setTag,
                             @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
-        
-        System.out.println("Tag: " + setTag);
-        System.out.println("Searched: " + setTag);
+       
+        System.out.println("Searched: " + searchKeywords);
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
@@ -195,11 +194,13 @@ public class SearchRoutes {
     @PostMapping("/addSet")
     public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName, @RequestParam("setAuthor") String setAuthor,
     Model model,  @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+        String setTag = "noValue";
         if (cookie != null) {
             String loggedInUserUid = cookie.getValue();
             Connection connection = null;
             PreparedStatement checkStatement = null;
             PreparedStatement insertStatement = null;
+        
             try {
                 // Establish a connection to the database
                 connection = Utility.createSQLConnection();
@@ -247,8 +248,19 @@ public class SearchRoutes {
 
                     System.out.println("INSIDE SeT INSERT");
                 }
-    
+                
+                //FINDing the tag name 
                 // Update hasSet in the model
+
+                String tagQuery = "SELECT t.tag_name FROM Tag t " +
+                  "JOIN SetHasTag sht ON t.tid = sht.tid " +
+                  "WHERE sht.sid = ?";
+                PreparedStatement tagStatement = connection.prepareStatement(tagQuery);
+                tagStatement.setString(1, searchKeywords);
+                ResultSet tagResultSet = tagStatement.executeQuery();
+                if (tagResultSet.next()) {
+                    setTag = tagResultSet.getString("tag_name");
+}
                 model.addAttribute("hasSet", hasSet);
 
                 System.out.println("Do they have set:" + hasSet);
@@ -268,8 +280,8 @@ public class SearchRoutes {
                 }
             }
         }
-      
-        String setTag = "noValue";
+
+        
         // Run the searchSets method to display the search results with the updated hasSet status
         return searchSets(setName, model, setTag, cookie);
         //"redirect:/quizMeDB/searchflashcards"
