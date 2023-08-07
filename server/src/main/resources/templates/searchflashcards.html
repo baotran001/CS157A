@@ -20,6 +20,7 @@
                     <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
                         <input type="hidden" name="searched" th:value="${searched}">
                         <input type="hidden" name="setName" th:value="${searched}">
+                        <input type="hidden" name="setTag" th:value="noValue">
                         <input type="hidden" name="searchType" value="flashcardSets">
                         <button class="tabBox" type="submit">Flashcard sets</button>
                     </form>
@@ -29,6 +30,42 @@
                         <input type="hidden" name="searched" th:value="${searched}">
                         <input type="hidden" name="searchType" value="users">
                         <button class="tabBox" type="submit">Users</button>
+                    </form>
+                </div>
+                <div class="tab">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                        <input type="hidden" name="searched" th:value="${searched}">
+                        <input type="hidden" name="setName" th:value="${searched}">
+                        <input type="hidden" name="setTag" th:value="English">
+                        <input type="hidden" name="searchType" value="flashcardSets">
+                        <button class="tabBox" type="submit">English</button>
+                    </form>
+                </div>
+                <div class="tab">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                        <input type="hidden" name="searched" th:value="${searched}">
+                        <input type="hidden" name="setName" th:value="${searched}">
+                        <input type="hidden" name="setTag" th:value="Math">
+                        <input type="hidden" name="searchType" value="flashcardSets">
+                        <button class="tabBox" type="submit">Math</button>
+                    </form>
+                </div>
+                <div class="tab">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                        <input type="hidden" name="searched" th:value="${searched}">
+                        <input type="hidden" name="setName" th:value="${searched}">
+                        <input type="hidden" name="setTag" th:value="Science">
+                        <input type="hidden" name="searchType" value="flashcardSets">
+                        <button class="tabBox" type="submit">Science</button>
+                    </form>
+                </div>
+                <div class="tab">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                        <input type="hidden" name="searched" th:value="${searched}">
+                        <input type="hidden" name="setName" th:value="${searched}">
+                        <input type="hidden" name="setTag" th:value="History">
+                        <input type="hidden" name="searchType" value="flashcardSets">
+                        <button class="tabBox" type="submit">History</button>
                     </form>
                 </div>
            
