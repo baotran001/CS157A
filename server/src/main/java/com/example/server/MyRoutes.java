@@ -2,6 +2,7 @@ package com.example.server;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -132,6 +133,36 @@ public class MyRoutes {
         return userFolders;
     }
     
+    //get user's sets without a folder
+    private List<Sets> getUserSetsWithoutFolder(String uid) throws SQLException {
+        List<Sets> userSetsWithoutFolder = new ArrayList<>();
+    
+        // Establish a SQL connection and execute a query to retrieve user's sets without a folder
+        Connection connection = Utility.createSQLConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "SELECT * FROM Sets WHERE author = '" + uid + "' AND sid NOT IN " +
+                       "(SELECT sid FROM FolderHasSets);";
+            ResultSet resultSet = statement.executeQuery(query);
+    
+            while (resultSet.next()) {
+                // Create a new Set object and populate its fields from the resultSet
+                Sets set = new Sets();
+                set.setSetid(resultSet.getString("sid"));
+                set.setName(resultSet.getString("name"));
+                set.setAuthor(resultSet.getString("author"));
+                set.setDescription(resultSet.getString("description"));
+                userSetsWithoutFolder.add(set);
+            }
+    
+            connection.close();
+        } catch (SQLException e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        }
+    
+        return userSetsWithoutFolder;
+    }
 
     @GetMapping("/home")
     public String showHome(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model){
@@ -148,6 +179,19 @@ public class MyRoutes {
             List<Folder> userFolders = getUserFoldersFromDatabase(cookie.getValue()); // You need to implement this method
     
             model.addAttribute("userFolders", userFolders);
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception, you can log or show an error message
+        }
+
+        try {
+            // Retrieve user's folders from the database (replace this with actual code)
+            List<Folder> userFolders = getUserFoldersFromDatabase(cookie.getValue()); // You need to implement this method
+
+            // Retrieve user's sets without a folder from the database (replace this with actual code)
+            List<Sets> userSetsWithoutFolder = getUserSetsWithoutFolder(cookie.getValue()); // You need to implement this method
+
+            model.addAttribute("userFolders", userFolders);
+            model.addAttribute("userSetsWithoutFolder", userSetsWithoutFolder);
         } catch (SQLException e) {
             e.printStackTrace(); // Handle the exception, you can log or show an error message
         }
