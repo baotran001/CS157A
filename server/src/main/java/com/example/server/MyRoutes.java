@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -197,6 +198,66 @@ public class MyRoutes {
         }
         
         return "home";
+    }
+
+    private List<Sets> getSetsInFolder(String fid) throws SQLException {
+        List<Sets> folderSets = new ArrayList<>();
+    
+        // Establish a SQL connection and execute a query to retrieve sets within the folder
+        Connection connection = Utility.createSQLConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "SELECT * FROM FolderHasSets fhs " +
+                           "JOIN Sets s ON fhs.sid = s.sid " +
+                           "WHERE fhs.fid = '" + fid + "';";
+            ResultSet resultSet = statement.executeQuery(query);
+    
+            while (resultSet.next()) {
+                // Create a new Sets object and populate its fields from the resultSet
+                Sets set = new Sets();
+                set.setSetid(resultSet.getString("s.sid"));
+                set.setName(resultSet.getString("s.name"));
+                set.setAuthor(resultSet.getString("s.author"));
+                set.setDate(resultSet.getDate("s.date"));
+                set.setDescription(resultSet.getString("s.description"));
+                folderSets.add(set);
+            }
+    
+            connection.close();
+        } catch (SQLException e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        }
+    
+        return folderSets;
+    }
+
+    //showing folder
+    @GetMapping("/folder")
+    public String showFolder(@RequestParam(name = "fid") String fid,
+                            @RequestParam(name = "name") String name,
+                            @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) {
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login"; // Redirect to the login page or an appropriate page
+        }
+
+        model.addAttribute("cookieName",cookie.getValue());
+        
+        // Add folder info to the model
+        model.addAttribute("folderId", fid);
+        model.addAttribute("folderName", name);
+
+        try {
+            // Retrieve sets within the specified folder from the database
+            List<Sets> folderSets = getSetsInFolder(fid); // You need to implement this method
+            model.addAttribute("folderSets", folderSets);
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception, you can log or show an error message
+        }
+        
+
+        return "folder"; // Return the name of the HTML template for the folder page
     }
 
     @GetMapping("/logout")
