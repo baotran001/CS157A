@@ -48,12 +48,13 @@
 
         </div>
           </ul>
-            <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
-              <input type="hidden" name="setTag" th:value="noValue">
-              <input type="hidden" name="setName" th:value="${searched}">
-              <input name = "searched" class="form-control mr-sm-2" type="search" placeholder="Search for a Set/User" aria-label="Search" required>
-              <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
-            </form>
+          <form class="form-inline my-2 my-lg-0" method="POST" th:action="@{/quizMeDB/searchflashcards/${searched}/${setTag}}">
+            <input type="hidden" name="setTag" th:value="noValue">
+            <input name="searched" class="form-control mr-sm-2" type="search" placeholder="Search for a Set/User" aria-label="Search"  th:value="${searched}" required>
+            <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
+        </form>
+
+        
             </div>
       </nav>
     </header>
