@@ -13,7 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,26 +23,20 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/quizMeDB")
 public class SearchRoutes {
-    private static final boolean BOOLEAN = false;
- @GetMapping("/searchflashcards/{searched}/{setTag}")
-public String displaySetsPage(@PathVariable("searched") String searchKeywords,
-                              @PathVariable("setTag") String setTag,
-                              @CookieValue(name = "user_uid", required = false) Cookie cookie,
-                              Model model) throws SQLException {
-    if (cookie != null) {
-        model.addAttribute("cookieName", cookie.getValue());
+    @GetMapping("/searchflashcards")
+    public String displaySetsPage(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        if(cookie != null){
+            model.addAttribute("cookieName",cookie.getValue());
+        }
+       
+        return "searchflashcards";
     }
-
-    return "redirect:/quizMeSB/searchflashcards/" + searchKeywords + "/" + setTag;
-}
-
-@PostMapping("/searchflashcards/{searched}/{setTag}")
-public String searchSets(@PathVariable("searched") String searchKeywords,
-                         @PathVariable("setTag") String setTag,
-                         @CookieValue(name = "user_uid", required = false) Cookie cookie,
-                         Model model) throws SQLException {
-                            System.out.println("Search Keywords: " + searchKeywords);
-    System.out.println("Set Tag: " + setTag);
+    @PostMapping("/searchflashcards")
+    public String searchSets(@RequestParam("searched") String searchKeywords , Model model, @RequestParam("setTag") String setTag,
+                            @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+        
+        System.out.println("Tag: " + setTag);
+        System.out.println("Searched: " + setTag);
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
@@ -152,8 +145,8 @@ public String searchSets(@PathVariable("searched") String searchKeywords,
                                 searchResults.add(sets);
                                 model.addAttribute("flashcardSets", searchResults);
 
-                                          if (cookie != null) {
-                                        boolean hasSet = true;
+                                 if (cookie != null) {
+                                    boolean hasSet = true;
                                         PreparedStatement checkStatement = null;
                                         String loggedInUserUid = cookie.getValue();
                                         String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
@@ -184,7 +177,6 @@ public String searchSets(@PathVariable("searched") String searchKeywords,
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            
             // Close the result set, statement, and connection
             if (resultSet != null) {
                 resultSet.close();
@@ -197,10 +189,10 @@ public String searchSets(@PathVariable("searched") String searchKeywords,
             }
         }
 
-        return "redirect:/quizMeSB/searchflashcards/" + searchKeywords + "/" + setTag;
+        return "searchflashcards"; // Return the same view to display the search results.
     }
 
-    @PostMapping("/addSet/{searched}/{setTag}")
+    @PostMapping("/addSet")
     public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName, @RequestParam("setAuthor") String setAuthor,
     Model model,  @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
         if (cookie != null) {
@@ -277,9 +269,9 @@ public String searchSets(@PathVariable("searched") String searchKeywords,
             }
         }
       
-    String setTag = "noValue";
+    
         // Run the searchSets method to display the search results with the updated hasSet status
-         return "redirect:/quizMeSB/searchflashcards/" + searchKeywords + "/" + setTag;
+        return searchSets(setName, model, cookie);
         //"redirect:/quizMeDB/searchflashcards"
     }
     
