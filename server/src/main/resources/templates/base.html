@@ -40,7 +40,12 @@
                             <a class="nav-link" href="/quizMeDB/logout">Logout</a>
                         </li>
 
-                        <p style="text-align: right;">Logged In As <span th:text="${cookieName}"></span></p>
+                        
+                        <li class="nav-item">
+                          <span class="nav-link">
+                              Logged In As <strong th:text="${cookieName}"></strong>
+                          </span>
+                      </li>
 
                     </ul>
                 </div>
@@ -48,10 +53,14 @@
 
         </div>
           </ul>
-            <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
-              <input name = "searched" class="form-control mr-sm-2" type="search" placeholder="Search for a Set/User" aria-label="Search" required>
-              <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
-            </form>
+          <form class="form-inline my-2 my-lg-0" method="POST" th:action="@{/quizMeDB/searchflashcards(searched=${searched},setTag=${setTag})}">
+            <input type="hidden" name="setTag" th:value="noValue">
+            <input name="searched" class="form-control mr-sm-2" type="search" placeholder="Search for a Set/User" aria-label="Search" th:value="one" required>
+            <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
+        </form>
+        
+
+        
             </div>
       </nav>
     </header>
