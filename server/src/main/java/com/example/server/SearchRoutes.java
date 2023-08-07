@@ -82,7 +82,7 @@ public class SearchRoutes {
                 model.addAttribute("flashcardSets", searchResults);
 
                  if (cookie != null) {
-                    boolean hasSet = false;
+                    boolean hasSet = true;
                     PreparedStatement checkStatement = null;
                     String loggedInUserUid = cookie.getValue();
                     String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
@@ -154,7 +154,7 @@ public class SearchRoutes {
                    insertStatement.setString(1, loggedInUserUid);
                    insertStatement.setString(2, searchKeywords);
                    insertStatement.executeUpdate();
-                   hasSet = false; // Update hasSet to false since we removed the set.
+                   hasSet = false;// Update hasSet to false since we removed the set.
 
                      System.out.println("INSIDE SeT remove");
                 } else {
@@ -164,7 +164,7 @@ public class SearchRoutes {
                     insertStatement.setString(1, loggedInUserUid);
                     insertStatement.setString(2, searchKeywords);
                     insertStatement.executeUpdate();
-                    hasSet = true; // Update hasSet to true since we added the set.
+                    hasSet = true;// Update hasSet to true since we added the set.
 
                     System.out.println("INSIDE SeT INSERT");
                 }
@@ -193,6 +193,7 @@ public class SearchRoutes {
     
         // Run the searchSets method to display the search results with the updated hasSet status
         return searchSets(setName, model, cookie);
+        //"redirect:/quizMeDB/searchflashcards"
     }
     
             
