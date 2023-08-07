@@ -134,3 +134,8 @@ CREATE TABLE UserHasFollowingList(
     FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE,
     FOREIGN KEY (fid) REFERENCES Users(uid) ON DELETE CASCADE
 );
+
+INSERT INTO Tag (tid, tag_name) VALUES ('1', 'English');
+INSERT INTO Tag (tid, tag_name) VALUES ('2', 'Math');
+INSERT INTO Tag (tid, tag_name) VALUES ('3', 'Science');
+INSERT INTO Tag (tid, tag_name) VALUES ('4', 'History');

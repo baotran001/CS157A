@@ -12,6 +12,7 @@ public class Sets {
     private java.sql.Date date;
     private String description;
     private String fid;
+    private String tag;
 
     public Sets(){
         this.sid = Utility.generateRandomId(15);
@@ -24,6 +25,14 @@ public class Sets {
 
     public void setFid(String fid){
         this.fid = fid;
+    }
+
+    public String getTag(){
+        return this.tag;
+    }
+
+    public void setTag(String tag){
+        this.tag = tag;
     }
 
     public String getSid(){

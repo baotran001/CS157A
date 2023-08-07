@@ -1,6 +1,10 @@
 package com.example.server;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.naming.spi.DirStateFactory.Result;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
@@ -35,6 +39,8 @@ public class SetsRoutes {
         this.folderName = folderName;
     }
 
+
+
     public boolean isValidFid(String fid) throws SQLException {
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
@@ -59,6 +65,29 @@ public class SetsRoutes {
 
         model.addAttribute("fName", getFolderName());
         model.addAttribute("fidVal", fidValue);
+    
+        Connection tagConnection = Utility.createSQLConnection();
+        Statement tagStatement = tagConnection.createStatement();
+        String queryTags = "SELECT * FROM Tag;";
+        ResultSet resTags = tagStatement.executeQuery(queryTags);
+        
+        List<Tag> tags = new ArrayList<>();
+        while (resTags.next()) {
+            Tag tag = new Tag();
+            tag.setTid(resTags.getString("tid"));
+            tag.setTag_name(resTags.getString("tag_name"));
+            tags.add(tag);
+
+            //System.out.println("Number of tags0: " + tags.size());
+        }
+        //System.out.println("Number of tags: " + tags.size());
+        
+        tagConnection.close();
+
+        model.addAttribute("tags", tags);
+        
+        //System.out.println("Number of tags2: " + tags.size());
+
         model.addAttribute("sets", new Sets());
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
@@ -86,6 +115,7 @@ public class SetsRoutes {
     }
     @PostMapping("/createSets")
     public String createSets(@RequestParam(name = "fid", required = false) String fid,
+                             @RequestParam(name = "tag") String tag,
                              @ModelAttribute("sets") Sets set, RedirectAttributes redirectAttributes,        
                              @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         
@@ -127,6 +157,14 @@ public class SetsRoutes {
             String query2 = "INSERT INTO UserCreatesSets (uid, sid) " + "VALUES ('" 
             + uid + "', '" + sid + "');";
             statement.executeUpdate(query2);
+
+            System.out.println("tag: " + tag);
+
+            // Insert into the set has tag table using the sid and tid
+            String query4 = "INSERT INTO SetHasTag (sid, tid) " + "VALUES ('" 
+            + sid + "', '" + tag + "');";
+            statement.executeUpdate(query4);
+
           
             // Check if the fid parameter is not null, meaning a folder ID is provided in the URL
             if (fidValue != null) {
@@ -136,7 +174,7 @@ public class SetsRoutes {
                     redirectAttributes.addFlashAttribute("error", "Invalid Folder ID (fid)");
                     return "redirect:/quizMeDB/flashcard?sid=" + sid + "&name=" + name;
                 }
-                
+
                 // Insert into the FolderHasSets table using the fid and sid
                 String query3 = "INSERT INTO FolderHasSets (fid, sid) " + "VALUES ('" 
                 + fidValue + "', '" + sid + "');";
