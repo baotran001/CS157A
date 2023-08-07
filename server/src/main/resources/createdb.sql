@@ -110,8 +110,8 @@ CREATE TABLE ReviewsHasLikesList(
 
 CREATE TABLE ReviewsHasComments(
     rid VARCHAR(15) NOT NULL,
-    cid INTEGER NOT NULL,
-    data DATE NOT NULL,
+    cid VARCHAR(15) NOT NULL,
+    date DATE NOT NULL,
     author VARCHAR(15) NOT NULL,
     text VARCHAR(255) NOT NULL,
     PRIMARY KEY (rid, cid),
@@ -120,7 +120,7 @@ CREATE TABLE ReviewsHasComments(
 );
 
 CREATE TABLE CommentsHasLikesList(
-    cid INTEGER NOT NULL, 
+    cid VARCHAR(15) NOT NULL, 
     uid VARCHAR(15) NOT NULL, 
     PRIMARY KEY (cid, uid),
     FOREIGN KEY (cid) REFERENCES ReviewsHasComments(cid) ON DELETE CASCADE,

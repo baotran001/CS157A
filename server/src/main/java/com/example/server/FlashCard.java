@@ -82,12 +82,12 @@ public class FlashCard {
             return false;
         }
         FlashCard flashCard = (FlashCard) o;
-        return Objects.equals(flashid, flashCard.flashid) && Objects.equals(favorite, flashCard.favorite) && Objects.equals(front, flashCard.front) && Objects.equals(back, flashCard.back);
+        return Objects.equals(front, flashCard.front) && Objects.equals(back, flashCard.back);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flashid, favorite, front, back);
+        return Objects.hash(front, back);
     }
 
     @Override

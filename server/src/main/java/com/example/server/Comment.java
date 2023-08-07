@@ -1,43 +1,24 @@
 package com.example.server;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Objects;
 
-public class Review {
-    private String rid;
-    private int star;
+public class Comment {
+    private String cid;
     private String author;
     private java.sql.Date date;
     private String text;
-    private ArrayList<Comment> comments;
 
-    public Review() {
-        this.rid = Utility.generateRandomId(15);
+    public Comment() {
+        this.cid = Utility.generateRandomId(15);
         this.date = java.sql.Date.valueOf(LocalDate.now());
-        this.comments = new ArrayList<>();
     }
 
-    public void addComment(Comment comment){
-        comments.add(comment);
+    public String getCid() {
+        return this.cid;
     }
 
-    public ArrayList<Comment> getComments(){
-        return this.comments;
-    }
-
-    public String getRid() {
-        return this.rid;
-    }
-
-    public void setRid(String rid) {
-        this.rid = rid;
-    }
-
-    public int getStar() {
-        return this.star;
-    }
-
-    public void setStar(int star) {
-        this.star = star;
+    public void setCid(String cid) {
+        this.cid = cid;
     }
 
     public String getAuthor() {
@@ -68,27 +49,25 @@ public class Review {
     public boolean equals(Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof Review)) {
+        if (!(o instanceof Comment)) {
             return false;
         }
-        Review review = (Review) o;
-        return Objects.equals(rid, review.rid) && star == review.star && Objects.equals(author, review.author) && Objects.equals(date, review.date) && Objects.equals(text, review.text);
+        Comment comment = (Comment) o;
+        return Objects.equals(cid, comment.cid) && Objects.equals(author, comment.author) && Objects.equals(date, comment.date) && Objects.equals(text, comment.text);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(rid, star, author, date, text);
+        return Objects.hash(cid, author, date, text);
     }
 
     @Override
     public String toString() {
         return "{" +
-            " rid='" + getRid() + "'" +
-            ", star='" + getStar() + "'" +
+            " cid='" + getCid() + "'" +
             ", author='" + getAuthor() + "'" +
             ", date='" + getDate() + "'" +
             ", text='" + getText() + "'" +
             "}";
     }
-
 }
