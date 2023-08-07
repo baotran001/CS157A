@@ -7,30 +7,39 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.card');
-            
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    card.classList.toggle('flipped');
-                    
-                    // Toggle content visibility
-                    
-                    /**
-                     * 
-                     * const frontContent = card.querySelector('.card-content-front');
-                    const backContent = card.querySelector('.card-content-back');
-                    
-                    if (card.classList.contains('flipped')) {
-                        frontContent.style.display = 'none';
-                        backContent.style.display = 'block';
-                    } else {
-                        frontContent.style.display = 'block';
-                        backContent.style.display = 'none';
-                    }
-                     **/
-                });
+        const flipButtons = document.querySelectorAll('.flipBtn');
+
+        flipButtons.forEach(flipButton => {
+            flipButton.addEventListener('click', () => {
+                const card = flipButton.closest('.card');
+                card.classList.toggle('flipped');
+                
+                const frontContent = card.querySelector('.card-content-front');
+                const backContent = card.querySelector('.card-content-back');
+                
+                if (card.classList.contains('flipped')) {
+                    frontContent.style.display = 'none';
+                    backContent.style.display = 'block';
+                } else {
+                    frontContent.style.display = 'block';
+                    backContent.style.display = 'none';
+                }
             });
         });
+                // Store scroll position before refreshing
+        window.addEventListener('beforeunload', function() {
+            localStorage.setItem('scrollPosition', window.scrollY);
+        });
+
+        // Restore scroll position after page loads
+        window.addEventListener('load', function() {
+            const scrollPosition = localStorage.getItem('scrollPosition');
+            if (scrollPosition) {
+                window.scrollTo(0, scrollPosition);
+                localStorage.removeItem('scrollPosition'); // Remove after using
+            }
+        });
+    });
     </script>
 </head>
 <body>
@@ -64,13 +73,31 @@
         <h1 style="margin-top: 20px; text-align: center;" >Flashcards</h1>
         <div class="card-container">
             <div class="card" th:each="item : ${dataList}">
+                <div style="
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                    ">
+                        <form id="itemForm" action="#" th:action="@{/quizMeDB/changeFavorite}" method="post">
+                            <input type="hidden" name="favoriteVal" th:value="${item.getFavorite()}"/>
+                            <input type="hidden" name="favoriteBox" th:value="${item.getFlashid()}"/>
+                            <button th:if="${item.getFavorite() == 'N'}" type="submit" class="registerbtn" style="border-radius: 5px;">Favorite</button>
+                            <button th:if="${item.getFavorite() == 'Y'}" type="submit" class="registerbtn" style="border-radius: 5px;">Unfavorite</button>
+                        </form>
+                        <button class="flipBtn" th:id="${item.getFlashid()}" style="
+                            background-color: #04AA6D;
+                            color: white;
+                            padding: 16px 20px;
+                            margin: 8px 0;
+                            border: none;
+                            cursor: pointer;
+                            width: 100%;
+                            opacity: 0.9;
+                            font-size: 20px;
+                        ">Flip</button>
+                </div>
                 <div class="card-content-front">
                     <h2>Front</h2>
-                    <span>
-                        <form action="#"  method="post">
-                            <input type="checkbox"/>
-                        </form>
-                    </span>
                     <p th:text="${item.getFront()}"></p>
                 </div>
                 <div class="card-content-back">
@@ -157,7 +184,29 @@
                 <span class="fa fa-star checked"></span>
                 <span class="fa fa-star checked"></span>
             </div>
-        
+            <span style="
+                margin-left: 82%;
+            ">
+                <form action="#" th:action="@{/quizMeDB/likeReview}" th:object="${review}" method="post"
+                style="display: inline-block;" id="likeBtn">
+                    <input type="hidden" name="ridField" th:value="${item.getRid()}"/>
+                    <button class="fa fa-thumbs-up" style="font-size:36px; 
+                    border: none; background-color: white;"></button>                    
+                </form>
+            </span>
+            <span style="
+                margin-left: 1%;
+            ">
+                <form action="#" th:action="@{/quizMeDB/dislikeReview}" th:object="${review}" method="post"
+                style="display: inline-block;" id="likeBtn">
+                    <input type="hidden" name="ridField" th:value="${item.getRid()}"/>
+                    <button type="submit" class="fa fa-thumbs-down" style="font-size:36px; 
+                    border: none; background-color: white;"></button>
+                </form>
+            </span>
+            <span style="
+                font-size: 30px; 
+            "th:text="${item.getNumLikes()}"></span>
             <p></p>
             <span><b>Date: </b></span> <span th:text="${item.getDate()}"></span>
             <span><b>Author: </b></span>: <span th:text="${item.getAuthor()}"></span><br/>
@@ -183,5 +232,14 @@
         <a href="/quizMeDB/login">Sign in</a>
     </div>
     </div>
+    <script>
+        function updateFavorite(checked) {
+            if (checked) {
+                // Checkbox is checked, set Favorite to "Y" here
+            } else {
+                // Checkbox is unchecked, set Favorite to "N" here
+            }
+        }
+    </script>
 </body>
 </html>
