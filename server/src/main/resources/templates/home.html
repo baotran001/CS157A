@@ -14,15 +14,20 @@
             <!-- Buttons for creating set and folder -->
             <div style="text-align: right;">
                 <a class="btn btn-success" th:href="@{/quizMeDB/createFolder}" style="margin-right: 10px;">Create Folder</a>
-                <a class="btn btn-success" th:href="@{/quizMeDB/sets}" style="margin-right: 10px;">Create Standalone Set</a>
+                <a class="btn btn-success" th:href="@{/quizMeDB/sets}" style="margin-right: 20px;">Create Standalone Set</a>
             </div>
 
+            <br>
+
              <!-- Iterate over user's folders -->
-             <div th:each="folder : ${userFolders}">
-                <!-- URL of the folder image -->
-                <img src="/images/folder.png" alt="Folder Image" style="width: 50px; height: 50px;">
-                <!-- URL of the folder link -->
-                <a th:href="@{/quizMeDB/folder/${folder.id}}">Go to Folder</a>
+             <div th:each="folder : ${userFolders}" style="margin-left: 20px; margin-right: 20px; margin-bottom: 20px; border: 1px solid #ccc; padding: 10px;">
+                <div style="display: flex; align-items: center;">
+                    <img src="/images/folder.png" alt="Folder Image" style="width: 50px; height: 50px; margin-right: 10px;">
+                    <div>
+                        <a th:href="@{/quizMeDB/folder/{folder.fid}(fid=${folder.fid})}" th:text="${folder.name}" style="text-decoration: none; font-weight: bold; display: block; margin-bottom: 5px;">Go to Folder</a>
+                        <p th:text="${folder.description}" style="margin: 0;"></p>
+                    </div>
+                </div>
             </div>
         </div>
         <div th:if="${cookieName == null}">

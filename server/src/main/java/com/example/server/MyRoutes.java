@@ -1,5 +1,7 @@
 package com.example.server;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -88,7 +90,7 @@ public class MyRoutes {
                 Cookie cookie = new Cookie("user_uid", username);
                 cookie.setMaxAge(3600); // Set the cookie's expiration time in seconds (1 hour in this example)
                 response.addCookie(cookie);
-                return "redirect:/quizMeDB/home?uid=" + username;
+                return "redirect:/quizMeDB/home";
             }
              connection.close();
          }catch (SQLException E){
@@ -101,15 +103,54 @@ public class MyRoutes {
         return "redirect:/quizMeDB/login";
     }
 
-
+    private List<Folder> getUserFoldersFromDatabase(String uid) throws SQLException {
+        List<Folder> userFolders = new ArrayList<>();
+    
+        // Establish a SQL connection and execute a query to retrieve user's folders
+        Connection connection = Utility.createSQLConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "SELECT * FROM Folder WHERE author = '" + uid + "';";
+            ResultSet resultSet = statement.executeQuery(query);
+    
+            while (resultSet.next()) {
+                // Create a new Folder object and populate its fields from the resultSet
+                Folder folder = new Folder();
+                folder.setFolderid(resultSet.getString("fid"));
+                folder.setName(resultSet.getString("name"));
+                folder.setAuthor(resultSet.getString("author"));
+                folder.setDescription(resultSet.getString("description"));
+                userFolders.add(folder);
+            }
+    
+            connection.close();
+        } catch (SQLException e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        }
+    
+        return userFolders;
+    }
+    
 
     @GetMapping("/home")
     public String showHome(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model){
         // Assign cookieName as name of user
-        if(cookie != null){
-            model.addAttribute("cookieName",cookie.getValue());
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login"; // Redirect to the login page or an appropriate page
         }
+        
+        model.addAttribute("cookieName",cookie.getValue());
 
+        try {
+            // Retrieve user's folders from the database (replace this with actual code)
+            List<Folder> userFolders = getUserFoldersFromDatabase(cookie.getValue()); // You need to implement this method
+    
+            model.addAttribute("userFolders", userFolders);
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception, you can log or show an error message
+        }
         
         return "home";
     }
