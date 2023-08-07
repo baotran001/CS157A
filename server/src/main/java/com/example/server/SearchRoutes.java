@@ -87,8 +87,8 @@ public class SearchRoutes {
                     String loggedInUserUid = cookie.getValue();
                     String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
                     checkStatement = connection.prepareStatement(checkQuery);
-                    System.out.println("USER IDT?: " + loggedInUserUid);
-                    System.out.println("SET ID?: " + sid);
+                    //System.out.println("USER IDT?: " + loggedInUserUid);
+                    //System.out.println("SET ID?: " + sid);
                     checkStatement.setString(1, loggedInUserUid);
                     checkStatement.setString(2, sid);
                     ResultSet result = checkStatement.executeQuery();
@@ -123,7 +123,7 @@ public class SearchRoutes {
     }
 
     @PostMapping("/addSet")
-    public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName,
+    public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName, @RequestParam("setAuthor") String setAuthor,
     Model model,  @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
         if (cookie != null) {
             String loggedInUserUid = cookie.getValue();
