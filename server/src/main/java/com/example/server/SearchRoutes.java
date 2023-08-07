@@ -148,13 +148,22 @@ public class SearchRoutes {
                }
             System.out.println("checking before I add <3" + hasSet);
                if (hasSet) {
-                   // The current user has the set, so we need to remove it.
+                if(loggedInUserUid.equals(setAuthor)){
+                String deleteQuery = "DELETE FROM Sets WHERE  sid = ?";
+                   insertStatement = connection.prepareStatement(deleteQuery);
+                   insertStatement.setString(1, searchKeywords);
+                   insertStatement.executeUpdate();
+                   hasSet = false;// Update hasSet to false since we removed the set.
+                }else{
+                     // The current user has the set, so we need to remove it.
                    String deleteQuery = "DELETE FROM UserCreatesSets WHERE uid = ? AND sid = ?";
                    insertStatement = connection.prepareStatement(deleteQuery);
                    insertStatement.setString(1, loggedInUserUid);
                    insertStatement.setString(2, searchKeywords);
                    insertStatement.executeUpdate();
                    hasSet = false;// Update hasSet to false since we removed the set.
+                }
+                  
 
                      System.out.println("INSIDE SeT remove");
                 } else {
