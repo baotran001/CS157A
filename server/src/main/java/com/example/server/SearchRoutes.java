@@ -269,9 +269,9 @@ public class SearchRoutes {
             }
         }
       
-    
+        String setTag = "noValue";
         // Run the searchSets method to display the search results with the updated hasSet status
-        return searchSets(setName, model, cookie);
+        return searchSets(setName, model, setTag, cookie);
         //"redirect:/quizMeDB/searchflashcards"
     }
     
