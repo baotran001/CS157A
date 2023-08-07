@@ -81,22 +81,26 @@ public class SearchRoutes {
                     
                     PreparedStatement tagstatement = connection.prepareStatement(tagquery);
                     tagstatement.setString(1, sid);
-                    String tag = resultSet.getString("tag_name");
-                    System.out.println(tag);
-                //DELETE
 
-  
+                    ResultSet tagResultSet = tagstatement.executeQuery();
+
                     Sets sets = new Sets();
-                    sets.setSetid(sid);
-                    sets.setName(name);
-                    sets.setAuthor(author);
-                    sets.setDate(date);
-                    sets.setDescription(description);
-                     sets.setTag(tag);
 
-                    ///DELETE THIS 
-                     sets.setTag(tag);
-                     //DELETE
+                    if (tagResultSet.next()) {
+                        String tag = tagResultSet.getString("tag_name");
+                        System.out.println(tag);
+                    
+                        sets.setSetid(sid);
+                        sets.setName(name);
+                        sets.setAuthor(author);
+                        sets.setDate(date);
+                        sets.setDescription(description);
+                        sets.setTag(tag);
+                    } else {
+                        System.out.println("No tag found for sid: " + sid);
+                    }
+                    
+                    
 
                     searchResults.add(sets);
                     model.addAttribute("flashcardSets", searchResults);
