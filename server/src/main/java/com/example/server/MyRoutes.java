@@ -88,7 +88,7 @@ public class MyRoutes {
                 Cookie cookie = new Cookie("user_uid", username);
                 cookie.setMaxAge(3600); // Set the cookie's expiration time in seconds (1 hour in this example)
                 response.addCookie(cookie);
-                return "redirect:/quizMeDB/home";
+                return "redirect:/quizMeDB/home?uid=" + username;
             }
              connection.close();
          }catch (SQLException E){
@@ -101,7 +101,7 @@ public class MyRoutes {
         return "redirect:/quizMeDB/login";
     }
 
-    
+
 
     @GetMapping("/home")
     public String showHome(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model){
