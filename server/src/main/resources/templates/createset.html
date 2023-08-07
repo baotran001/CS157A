@@ -30,7 +30,7 @@
                     
                     <label><b>Select Tag</b></label>
                     <select th:field="*{tag}">
-                        <option value="">Select Tag</option>
+                        <!--option value="">Select Tag</option-->
                         <option th:each="tag : ${tags}" th:value="${tag.tid}" th:text="${tag.tag_name}"></option>
                     </select>
 
