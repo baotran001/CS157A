@@ -9,8 +9,6 @@
     <div th:replace="~{base :: header}"></div>
     <div th:fragment="content"> 
         <div th:if="${cookieName}">
-            <p style="font-size: 24; text-align: right;">Logged In As <span th:text="${cookieName}"></span></p>
-            <a href="/quizMeDB/logout">Logout</a>
             <h1 style="text-align: center;" >Creating A New Set</h1>
 
             <form action="#" th:action="@{/quizMeDB/createSets}" th:object="${sets}" method="post">
@@ -30,6 +28,12 @@
                     <label><b>Create Set Description</b></label>
                     <input type="text" placeholder="Enter Description" th:field="*{description}" required>
                     
+                    <label><b>Select Tag</b></label>
+                    <select th:field="*{tag}">
+                        <option value="">Select Tag</option>
+                        <option th:each="tag : ${tags}" th:value="${tag.tid}" th:text="${tag.tag_name}"></option>
+                    </select>
+
                     <input type="hidden" th:name="fid" th:value="${fidVal}" />
                     <button type="submit" class="registerbtn">Submit</button>
                 </div>
