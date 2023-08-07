@@ -65,7 +65,7 @@ CREATE TABLE Flashcards(
 
 CREATE TABLE FrontHasBack(
     front VARCHAR(255) PRIMARY KEY,
-    back VARCHAR(255)
+    back VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE SetHasFlashcards(
