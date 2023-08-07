@@ -50,6 +50,7 @@
                             <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/addSet">
                                 <input type="hidden" name="searched" th:value="${flashcardSet.sid}">
                                 <input type="hidden" name="setName" th:value="${flashcardSet.name}">
+                                <input type="hidden" name="setAuthor" th:value="${flashcardSet.author}">
                                 <input type="hidden" name="searchType" value="set">
                                 <button class="follow-button" type="submit" th:text="${hasSet ? 'Remove Set' : 'Add Set'}"></button>
                             </form>

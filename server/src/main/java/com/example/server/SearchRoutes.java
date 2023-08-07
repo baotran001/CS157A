@@ -123,7 +123,7 @@ public class SearchRoutes {
     }
 
     @PostMapping("/addSet")
-    public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName,
+    public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName, @RequestParam("setAuthor") String setAuthor,
     Model model,  @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
         if (cookie != null) {
             String loggedInUserUid = cookie.getValue();
