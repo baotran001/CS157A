@@ -9,11 +9,20 @@ public class Review {
     private java.sql.Date date;
     private String text;
     private ArrayList<Comment> comments;
+    private int numLikes;
 
     public Review() {
         this.rid = Utility.generateRandomId(15);
         this.date = java.sql.Date.valueOf(LocalDate.now());
         this.comments = new ArrayList<>();
+    }
+
+    public void setNumLikes(int x){
+        this.numLikes = x;
+    }
+
+    public int getNumLikes(){
+        return this.numLikes;
     }
 
     public void addComment(Comment comment){

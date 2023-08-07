@@ -3,6 +3,7 @@ import java.sql.*;
 import java.util.*;
 import javax.naming.spi.DirStateFactory.Result;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -44,20 +45,26 @@ public class FlashcardRoutes {
         this.sid = sid;
     }
 
+
     @GetMapping("/flashcard")
     public String displayFlashcardsPage(@RequestParam("sid") String sidValue, 
     @RequestParam("name") String setName, RedirectAttributes redirectAttributes, @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         if(cookie != null){
+            // retrieve username, setname
             model.addAttribute("cookieName",cookie.getValue());
             setSetName(setName);
             setSid(sidValue);
             model.addAttribute("sName", getSetName());
             model.addAttribute("sidVal", getSid());
+
+            // Create flashcard, review, comment objects for submission forms
             model.addAttribute("flashcard", new FlashCard());
             model.addAttribute("review", new Review());
             model.addAttribute("comment", new Comment());
             Connection connection = Utility.createSQLConnection();
             Statement statement = connection.createStatement();
+
+            // Retrieve all flashcards belonging to the set
             String query = 
             "Select DISTINCT F.flashid, F.favorite, F.front, FB.back FROM flashcards F, FrontHasBack FB" +
             ", sethasflashcards SF WHERE F.front = FB.front AND F.flashid = SF.flashid AND " + "SF.sid = '" + sidValue + "';";
@@ -73,8 +80,9 @@ public class FlashcardRoutes {
             }
             model.addAttribute("dataList", flashcArr);
 
+            // Retrive all reviews belonging to the set
             String query1 = "SELECT DISTINCT R.rid, R.star, R.author, R.date, R.text FROM Reviews R, setshasreviews SR, userwritesreviews UR " + 
-            "WHERE R.rid = SR.rid AND R.rid = UR.rid AND SR.sid = '" + getSid() + "' AND UR.uid = '" + cookie.getValue() + "';";
+            "WHERE R.rid = SR.rid AND R.rid = UR.rid AND SR.sid = '" + getSid() + "';";
             ResultSet res1 = statement.executeQuery(query1);
             ArrayList<Review> reviewArr = new ArrayList<>();
             while (res1.next()) {
@@ -84,9 +92,21 @@ public class FlashcardRoutes {
                 review.setAuthor(res1.getString("author"));
                 review.setDate(res1.getDate("date"));
                 review.setText(res1.getString("text"));
+
                 reviewArr.add(review);
             }
             model.addAttribute("reviewList", reviewArr);
+
+            // Retrieve number of likes
+            for(Review review: reviewArr){
+                String query3 = "SELECT COUNT(*) FROM reviewshaslikeslist WHERE rid = '" + review.getRid() + "';";
+                ResultSet rs3 = statement.executeQuery(query3);
+                if(rs3.next()){
+                    review.setNumLikes(rs3.getInt("COUNT(*)"));
+                }
+            }
+
+            // For each review add all replies associated with it
             for(Review review: reviewArr){
                 String query2 = "SELECT RHC.rid, RHC.cid," +
                 "RHC.date, RHC.author, RHC.text FROM reviewshascomments RHC, Reviews R " + 
@@ -102,6 +122,7 @@ public class FlashcardRoutes {
                 }
         }
 
+
         connection.close();
         }
         return "flashcard";
@@ -115,12 +136,13 @@ public class FlashcardRoutes {
         String back = flashcard.getBack();
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
-        String query = "SELECT COUNT(*) FROM FrontHasBack WHERE front = '" + front + "' AND back = '" + back + "';";
+        String query = "SELECT COUNT(*) FROM FrontHasBack WHERE front = '" + front + "';";
         int count = 0;
         ResultSet rs = statement.executeQuery(query);
         if (rs.next()) {
             count = rs.getInt("Count(*)");
         }
+        System.out.println(count);
         if (count == 0){
             String query1 = "INSERT INTO FrontHasBack (front, back) " + "VALUES ('" 
             + front + "', '" + back  + "');";
@@ -183,6 +205,59 @@ public class FlashcardRoutes {
         statement.executeUpdate(query1);
 
         connection.close();
+        return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
+    }
+
+    @PostMapping("/changeFavorite")
+    public String changeFavorite(RedirectAttributes redirectAttributes, @RequestParam("favoriteVal") String favoriteVal,
+     @RequestParam("favoriteBox") String flashid, @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        Connection connection = Utility.createSQLConnection();
+        Statement statement = connection.createStatement();
+        String fav = "";
+        if(favoriteVal.equals("N")){
+            fav += "Y";
+        } else {
+            fav += "N";
+        }
+        String query1 = "Update flashcards SET favorite = '" + fav + "' WHERE flashid = '"
+        + flashid + "';";
+        statement.executeUpdate(query1);
+        connection.close();
+        return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
+    }
+
+    @PostMapping("/likeReview")
+    public String likeReview(RedirectAttributes redirectAttributes, @RequestParam("ridField") String ridValue,
+    @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        Connection connection = Utility.createSQLConnection();
+        Statement statement = connection.createStatement();
+        if(cookie != null){
+            String query = "SELECT COUNT(*) FROM reviewshaslikeslist WHERE rid = '" + ridValue +
+            "' AND uid = '" + cookie.getValue() + "';";
+            ResultSet rs = statement.executeQuery(query);
+            int count = 0;
+            if (rs.next()) {
+            count = rs.getInt("Count(*)");
+            }
+            if(count == 0){
+                String query1 = "INSERT INTO reviewshaslikeslist (rid, uid) VALUES ('" + ridValue +
+                "', '" + cookie.getValue() + "');";
+                statement.executeUpdate(query1);
+            }
+        }
+        return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
+    }
+
+    @PostMapping("/dislikeReview")
+    public String dislikeReview(RedirectAttributes redirectAttributes, @RequestParam("ridField") String ridValue,
+    @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        Connection connection = Utility.createSQLConnection();
+        Statement statement = connection.createStatement();
+        if(cookie != null){
+            String query1 = "DELETE FROM reviewshaslikeslist WHERE rid = '" + ridValue +
+            "' AND uid = '" + cookie.getValue() + "';";
+            statement.executeUpdate(query1);
+        }
         return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
     }
 }

@@ -100,3 +100,13 @@ body {
 .checked {
   color: orange;
 }
+
+.flipBtn{
+  border: .2px solid gray;
+  border-radius: 5px;
+}
+
+.flipBtn:hover{
+  background-color: #095e3e;
+  border: .2px solid gray;
+}
