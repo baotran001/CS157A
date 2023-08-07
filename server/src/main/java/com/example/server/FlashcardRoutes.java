@@ -78,7 +78,27 @@ public class FlashcardRoutes {
         }
         model.addAttribute("dataList", flashcArr);
 
-        // Set List
+        String query1 = "SELECT DISTINCT R.rid, R.star, R.author, R.date, R.text FROM Reviews R, setshasreviews SR, userwritesreviews UR " + 
+        "WHERE R.rid = SR.rid AND R.rid = UR.rid AND SR.sid = '" + getSid() + "' AND UR.uid = '" + cookie.getValue() + "';";
+        ResultSet res1 = statement.executeQuery(query1);
+        ArrayList<Review> reviewArr = new ArrayList<>();
+        while (res1.next()) {
+            String rid = res1.getString("rid");
+            int star = res1.getInt("star");
+            String author = res1.getString("author");
+            java.sql.Date date = res1.getDate("date");
+            String text = res1.getString("text");
+
+            Review review = new Review();
+            review.setRid(rid);
+            review.setStar(star);
+            review.setAuthor(author);
+            review.setDate(date);
+            review.setText(text);
+            reviewArr.add(review);
+        }
+        model.addAttribute("reviewList", reviewArr);
+        connection.close();
         return "flashcard";
     }
     @PostMapping("/flashcard")
@@ -90,24 +110,24 @@ public class FlashcardRoutes {
         String back = flashcard.getBack();
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
-        try{
+        String query = "SELECT COUNT(*) FROM FrontHasBack WHERE front = '" + front + "' AND back = '" + back + "';";
+        int count = 0;
+        ResultSet rs = statement.executeQuery(query);
+        if (rs.next()) {
+            count = rs.getInt("Count(*)");
+        }
+        if (count == 0){
             String query1 = "INSERT INTO FrontHasBack (front, back) " + "VALUES ('" 
             + front + "', '" + back  + "');";
             statement.executeUpdate(query1);
-        }catch(SQLException E){
-            System.out.println("SQLException:" + E.getMessage());
-            System.out.println("SQLState:" + E.getSQLState());
-            System.out.println("VendorError:" + E.getErrorCode());
-            redirectAttributes.addFlashAttribute("errorMessage", "The flashcard already exists!");
-            return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName(); // Redirect to the error page with the error message
         }
-        String query = "INSERT INTO flashcards (flashid, favorite, front) " + "VALUES ('" 
+        String query2 = "INSERT INTO flashcards (flashid, favorite, front) " + "VALUES ('" 
         + flashid + "', '" + favorite + "', '" + front  + "');";
-        statement.executeUpdate(query);
-
-        String query2 = "INSERT INTO sethasflashcards (sid, flashid)" + " VALUES ('" +
-        sidValue + "', '" + flashid + "');";
         statement.executeUpdate(query2);
+
+        String query3 = "INSERT INTO sethasflashcards (sid, flashid)" + " VALUES ('" +
+        sidValue + "', '" + flashid + "');";
+        statement.executeUpdate(query3);
     
         connection.close();
         redirectAttributes.addFlashAttribute("success", "Success!");
@@ -128,6 +148,15 @@ public class FlashcardRoutes {
         String query1 = "INSERT INTO Reviews (rid, star, author, date, text) " + "VALUES ('" 
         + rid + "', " + star + ", '" + author  + "', '" + date + "', '" + text + "');";
         statement.executeUpdate(query1);
+
+        String query2 = "INSERT INTO setshasreviews (sid, rid) " + "VALUES ('" +
+        getSid() + "', '" + rid + "');";
+        statement.executeUpdate(query2);
+        
+        String query3 = "INSERT INTO userwritesreviews (uid, rid) " + "VALUES ('" +
+        cookie.getValue() + "', '" + rid + "');";
+        statement.executeUpdate(query3);
+
         redirectAttributes.addFlashAttribute("success", "Review Created!");
         return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
     }

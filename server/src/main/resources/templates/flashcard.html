@@ -4,6 +4,7 @@
     <title>Create Flash Card</title>
     <link href="../static/css/flashcard.css" rel="stylesheet" type="text/css" th:href="@{/css/flashcard.css}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.card');
@@ -81,23 +82,78 @@
             <div class="container">
 
           <label><b>Rate</b></label>
-          <input type="number" placeholder="Rate the Set" th:field="*{star}" required min="0" max="5"
-          style="
-            width: 100%;
-            padding: 15px;
-            margin: 5px 0 22px 0;
-            display: inline-block;
-            border: none;
-            background: #f1f1f1;
-          ">
-      
-          <label><b>Text</b></label>
-          <input type="text" placeholder="Write your Review Here" th:field="*{text}" required>
+            <input type="number" placeholder="Rate the Set" th:field="*{star}" required min="0" max="5"
+            style="
+                width: 100%;
+                padding: 15px;
+                margin: 5px 0 22px 0;
+                display: inline-block;
+                border: none;
+                background: #f1f1f1;
+            ">
+        
+            <label><b>Text</b></label>
+            <input type="text" placeholder="Write your Review Here" th:field="*{text}" required>
 
-          <button type="submit" class="registerbtn">Submit</button>
+            <button type="submit" class="registerbtn">Submit</button>
+            </div>
+        </form>
+        <h1 style="margin-top: 20px; text-align: center;" >View Flashcards</h1>
+        <div class="container" style="margin-bottom: 10px;"th:each="item : ${reviewList}">
+            <h4>Rating</h4>
+            <div th:if="${item.getStar() == 0}">
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+            </div>
+
+            <div th:if="${item.getStar() == 1}">
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star "></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+            </div>
+
+            <div th:if="${item.getStar() == 2}">
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+            </div>
+
+            <div th:if="${item.getStar() == 3}">
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
+            </div>
+
+            <div th:if="${item.getStar() == 4}">
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star"></span>
+            </div>
+
+            <div th:if="${item.getStar() == 5}">
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+            </div>
+        
+            <p></p>
+            <span><b>Date: </b></span> <span th:text="${item.getDate()}"></span>
+            <span><b>Author: </b></span>: <span th:text="${item.getAuthor()}"></span><hr/>
+            <span><b>Comment: </b></span> <span th:text="${item.getText()}"></span>
         </div>
-    
-    </form>
     </div>
     <div th:if="${cookieName == null}">
         <p>User not logged in!</p>
