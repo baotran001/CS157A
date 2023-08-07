@@ -20,6 +20,7 @@
                 <div class="tab">
                     <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
                         <input type="hidden" name="searched" th:value="${searched}">
+                        <input type="hidden" name="setName" th:value="${searched}">
                         <input type="hidden" name="searchType" value="flashcardSets">
                         <button class="tabBox" type="submit">Flashcard sets</button>
                     </form>

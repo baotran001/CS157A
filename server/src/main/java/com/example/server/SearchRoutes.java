@@ -32,7 +32,7 @@ public class SearchRoutes {
         return "searchflashcards";
     }
     @PostMapping("/searchflashcards")
-    public String searchSets(@RequestParam("searched") String searchKeywords, Model model,
+    public String searchSets(@RequestParam("searched") String searchKeywords , Model model,
                             @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
@@ -44,6 +44,7 @@ public class SearchRoutes {
         ResultSet resultSet = null;
         ArrayList<Sets> searchResults = new ArrayList<>();
          try {
+
             // Establish a connection to the database
             connection = Utility.createSQLConnection();
 
@@ -61,6 +62,9 @@ public class SearchRoutes {
             model.addAttribute("searched", searchQuery);
             // Process the search results and add them to the searchResults ArrayList
             while (resultSet.next()) {
+
+                
+                
                 String sid = resultSet.getString("sid");
                 String name = resultSet.getString("name");
                 String author = resultSet.getString("author");
@@ -75,26 +79,31 @@ public class SearchRoutes {
                 sets.setDescription(description);
 
                 searchResults.add(sets);
+                model.addAttribute("flashcardSets", searchResults);
+
+                 if (cookie != null) {
+                    boolean hasSet = false;
+                    PreparedStatement checkStatement = null;
+                    String loggedInUserUid = cookie.getValue();
+                    String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+                    checkStatement = connection.prepareStatement(checkQuery);
+                    System.out.println("USER IDT?: " + loggedInUserUid);
+                    System.out.println("SET ID?: " + sid);
+                    checkStatement.setString(1, loggedInUserUid);
+                    checkStatement.setString(2, sid);
+                    ResultSet result = checkStatement.executeQuery();
+        
+                    if (result.next() && result.getInt(1) == 0) {
+                        // The current user does not have the set
+                        hasSet = false;
+                    }
+
+                    System.out.println("GOT SET?: " + hasSet);
+                    model.addAttribute("hasSet", hasSet);
+                }
             }
 
-             boolean hasSet = false;
-        if (cookie != null) {
-            String loggedInUserUid = cookie.getValue();
-            String checkSetQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
-            PreparedStatement checkSetStatement = connection.prepareStatement(checkSetQuery);
-            checkSetStatement.setString(1, searchKeywords);
-            checkSetStatement.setString(2,loggedInUserUid);
-            ResultSet checkSetResultSet = checkSetStatement.executeQuery();
-            if (checkSetResultSet.next() && checkSetResultSet.getInt(1) > 0) {
-                // The current user is following the searched user
-                hasSet = true;
-            }
-            checkSetResultSet.close();
-            checkSetStatement.close();
-        }
-            model.addAttribute("hasSet", hasSet);
-            // Add the flashcard set search results to the model as an attribute.
-            model.addAttribute("flashcardSets", searchResults);
+            
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -114,8 +123,8 @@ public class SearchRoutes {
     }
 
     @PostMapping("/addSet")
-    public String addSet(@RequestParam("searched") String searchKeywords, Model model,
-                         @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+    public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName,
+    Model model,  @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
         if (cookie != null) {
             String loggedInUserUid = cookie.getValue();
             Connection connection = null;
@@ -125,27 +134,29 @@ public class SearchRoutes {
                 // Establish a connection to the database
                 connection = Utility.createSQLConnection();
                 
-                // Check if the current user has the set
-                boolean hasSet = true;
-                String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
-                checkStatement = connection.prepareStatement(checkQuery);
-                checkStatement.setString(1, loggedInUserUid);
-                checkStatement.setString(2, searchKeywords);
-                ResultSet resultSet = checkStatement.executeQuery();
-    
-                if (resultSet.next() && resultSet.getInt(1) == 0) {
-                    // The current user does not have the set
-                    hasSet = false;
-                }
-    
-                if (hasSet) {
-                    // The current user has the set, so we need to remove it.
-                    String deleteQuery = "DELETE FROM UserCreatesSets WHERE uid = ? AND sid = ?";
-                    insertStatement = connection.prepareStatement(deleteQuery);
-                    insertStatement.setString(1, loggedInUserUid);
-                    insertStatement.setString(2, searchKeywords);
-                    insertStatement.executeUpdate();
-                    hasSet = false; // Update hasSet to false since we removed the set.
+               // Check if the current user has the set
+               boolean hasSet = true;
+               String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+               checkStatement = connection.prepareStatement(checkQuery);
+               checkStatement.setString(1, loggedInUserUid);
+               checkStatement.setString(2, searchKeywords);
+               ResultSet resultSet = checkStatement.executeQuery();
+   
+               if (resultSet.next() && resultSet.getInt(1) == 0) {
+                   // The current user does not have the set
+                   hasSet = false;
+               }
+            System.out.println("checking before I add <3" + hasSet);
+               if (hasSet) {
+                   // The current user has the set, so we need to remove it.
+                   String deleteQuery = "DELETE FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+                   insertStatement = connection.prepareStatement(deleteQuery);
+                   insertStatement.setString(1, loggedInUserUid);
+                   insertStatement.setString(2, searchKeywords);
+                   insertStatement.executeUpdate();
+                   hasSet = false; // Update hasSet to false since we removed the set.
+
+                     System.out.println("INSIDE SeT remove");
                 } else {
                     // The current user does not have the set, so we need to add it.
                     String insertQuery = "INSERT INTO UserCreatesSets (uid, sid) VALUES (?, ?)";
@@ -154,10 +165,14 @@ public class SearchRoutes {
                     insertStatement.setString(2, searchKeywords);
                     insertStatement.executeUpdate();
                     hasSet = true; // Update hasSet to true since we added the set.
+
+                    System.out.println("INSIDE SeT INSERT");
                 }
     
                 // Update hasSet in the model
                 model.addAttribute("hasSet", hasSet);
+
+                System.out.println("Do they have set:" + hasSet);
     
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -174,9 +189,10 @@ public class SearchRoutes {
                 }
             }
         }
+      
     
         // Run the searchSets method to display the search results with the updated hasSet status
-        return searchSets(searchKeywords, model, cookie);
+        return searchSets(setName, model, cookie);
     }
     
             
