@@ -93,7 +93,7 @@ public class SearchRoutes {
                     checkStatement.setString(2, sid);
                     ResultSet result = checkStatement.executeQuery();
         
-                    if (result.next() && result.getInt(1) == 0) {
+                    if (result.next() && result.getInt("COUNT(*)") == 0) {
                         // The current user does not have the set
                         hasSet = false;
                     }
@@ -142,7 +142,7 @@ public class SearchRoutes {
                checkStatement.setString(2, searchKeywords);
                ResultSet resultSet = checkStatement.executeQuery();
    
-               if (resultSet.next() && resultSet.getInt(1) == 0) {
+               if (resultSet.next() && resultSet.getInt("COUNT(*)") == 0) {
                    // The current user does not have the set
                    hasSet = false;
                }
