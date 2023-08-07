@@ -11,6 +11,12 @@
         <div th:if="${cookieName}">
             <h1 style="text-align: center;" >View Flashcard Collection</h1>
             
+            <!-- Buttons for creating set and folder -->
+            <div style="text-align: right;">
+                <a class="btn btn-success" th:href="@{/quizMeDB/createFolder}" style="margin-right: 10px;">Create Folder</a>
+                <a class="btn btn-success" th:href="@{/quizMeDB/sets}" style="margin-right: 10px;">Create Standalone Set</a>
+            </div>
+
              <!-- Iterate over user's folders -->
              <div th:each="folder : ${userFolders}">
                 <!-- URL of the folder image -->
