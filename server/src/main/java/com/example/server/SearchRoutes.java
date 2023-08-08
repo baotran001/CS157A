@@ -23,20 +23,64 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/quizMeDB")
 public class SearchRoutes {
+
+    private ArrayList<Sets> setList;
+    private String filterTag;
+
+    public void setFilterTag(String x){
+        this.filterTag = x;
+    }
+
+    public String getFilterTag(){
+        return this.filterTag;
+    }
+
+    public void setSetList(ArrayList<Sets> s){
+        this.setList = new ArrayList<>(s);
+    } 
+
+    public ArrayList<Sets> getSetList(){
+        return this.setList;
+    }
+
     @GetMapping("/searchflashcards")
-    public String displaySetsPage(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+    public String displaySetsPage(   
+    @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
-       
+        ArrayList<Sets> filteredSets = new ArrayList<>();
+        System.out.println(getFilterTag());
+        System.out.println(!getFilterTag().equals("noValue"));
+        if(!getFilterTag().equals("noValue")){
+            for(int i = 0; i < getSetList().size(); i++){
+                if(getSetList().get(i).getTag().equals(getFilterTag())){
+                    filteredSets.add(getSetList().get(i));
+                }
+            }
+            model.addAttribute("flashcardSets", filteredSets);
+        } else {
+            model.addAttribute("flashcardSets", getSetList());
+        }
         return "searchflashcards";
     }
+
+    @PostMapping("/filterTag")
+    public String setFilter(   
+    @RequestParam("setTag") String filterTag,
+    @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        setFilterTag(filterTag);
+        System.out.println(getSetList());
+        model.addAttribute("flashcardSets", getSetList());
+        return "redirect:/quizMeDB/searchflashcards";
+    }
+
     @PostMapping("/searchflashcards")
-    public String searchSets(@RequestParam("searched") String searchKeywords , Model model, @RequestParam("setTag") String setTag,
-                            @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
-       
+    public String searchSets( 
+        @RequestParam("searched") String searchKeywords , Model model,
+        @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+        
         System.out.println("Searched: " + searchKeywords);
-         System.out.println("Ssearxhed TAG: " + setTag);
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
@@ -66,8 +110,6 @@ public class SearchRoutes {
             // Process the search results and add them to the searchResults ArrayList
             while (resultSet.next()) {
 
-                //IF THERE IS NOT SET TAG
-                if(setTag.equals("noValue")){
                     String sid = resultSet.getString("sid");
                     String name = resultSet.getString("name");
                     String author = resultSet.getString("author");
@@ -100,14 +142,11 @@ public class SearchRoutes {
                         System.out.println("No tag found for sid: " + sid);
                     }
                     
-                    
-
-                    searchResults.add(sets);
-                    model.addAttribute("flashcardSets", searchResults);
 
                     if (cookie != null) {
-                    boolean hasSet = true;
+                        boolean hasSet = true;
                         PreparedStatement checkStatement = null;
+
                         String loggedInUserUid = cookie.getValue();
                         String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
                         checkStatement = connection.prepareStatement(checkQuery);
@@ -121,83 +160,13 @@ public class SearchRoutes {
                             // The current user does not have the set
                             hasSet = false;
                         }
-
-                        System.out.println("GOT SET?: " + hasSet);
+                        sets.setHasSet(hasSet);
                         model.addAttribute("hasSet", hasSet);
                     }
-                }else{
-                    if (setTag != null && !setTag.isEmpty()) {
-                        //System.out.println("Set Tag is:" + setTag);
-                        String sid = resultSet.getString("sid");
-                        PreparedStatement tagStatement = null;
-                        String tagQuery = "SELECT tid FROM Tag WHERE tag_name = ?";
-                        tagStatement = connection.prepareStatement(tagQuery);
-                        tagStatement.setString(1, setTag);
-                        ResultSet tagResultSet = tagStatement.executeQuery();
-        
-                        if (tagResultSet.next()) {
-                            //System.out.println("THERE ARE TAGS" + setTag);
-                            String tid = tagResultSet.getString("tid");
-                            String setTagQuery = "SELECT sid FROM SetHasTag WHERE tid = ? AND sid = ?";
-                            PreparedStatement setTagStatement = connection.prepareStatement(setTagQuery);
-                            setTagStatement.setString(1, tid);
-                            setTagStatement.setString(2, sid);
-                            ResultSet setTagResultSet = setTagStatement.executeQuery();
-        
-                            if (setTagResultSet.next()) {
-                                Sets taggedSet = new Sets();
-                                taggedSet.setSetid(sid);
-                                System.out.println("THIS IS SID: " + sid);
-                                // Fetch other details of the set if needed
-
-                                String name = resultSet.getString("name");
-                                System.out.println("THIS IS NAME: " + name);
-                                String author = resultSet.getString("author");
-                                Date date = resultSet.getDate("date");
-                                String description = resultSet.getString("description");
-
-
-                                
-
-                                Sets sets = new Sets();
-                                sets.setSetid(sid);
-                                sets.setName(name);
-                                sets.setAuthor(author);
-                                sets.setDate(date);
-                                sets.setDescription(description);
-
-                                searchResults.add(sets);
-                                model.addAttribute("flashcardSets", searchResults);
-
-                                 if (cookie != null) {
-                                    boolean hasSet = true;
-                                        PreparedStatement checkStatement = null;
-                                        String loggedInUserUid = cookie.getValue();
-                                        String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
-                                        checkStatement = connection.prepareStatement(checkQuery);
-                                        //System.out.println("USER IDT?: " + loggedInUserUid);
-                                        //System.out.println("SET ID?: " + sid);
-                                        checkStatement.setString(1, loggedInUserUid);
-                                        checkStatement.setString(2, sid);
-                                        ResultSet result = checkStatement.executeQuery();
-                            
-                                        if (result.next() && result.getInt("COUNT(*)") == 0) {
-                                            // The current user does not have the set
-                                            hasSet = false;
-                                        }
-
-                                        System.out.println("GOT SET?: " + hasSet);
-                                        model.addAttribute("hasSet", hasSet);
-                                 }
-                            }
-                        }
-                    }
-                
-                }
-                
+                searchResults.add(sets);
             }
-
-            
+        model.addAttribute("flashcardSets", searchResults);
+        setSetList(searchResults);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -217,91 +186,232 @@ public class SearchRoutes {
     }
 
     @PostMapping("/addSet")
-    public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName, @RequestParam("setAuthor") String setAuthor,
+    public String addSet(@RequestParam("searched") String sidValue, @RequestParam("setName") String setName, @RequestParam("setAuthor") String setAuthor,
     Model model,  @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
-        String setTag = "noValue";
-        if (cookie != null) {
-            String loggedInUserUid = cookie.getValue();
-            Connection connection = null;
-            PreparedStatement checkStatement = null;
-            PreparedStatement insertStatement = null;
-        
-            try {
-                // Establish a connection to the database
-                connection = Utility.createSQLConnection();
-                
-               // Check if the current user has the set
-               boolean hasSet = true;
-               String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
-               checkStatement = connection.prepareStatement(checkQuery);
-               checkStatement.setString(1, loggedInUserUid);
-               checkStatement.setString(2, searchKeywords);
-               ResultSet resultSet = checkStatement.executeQuery();
-   
-               if (resultSet.next() && resultSet.getInt("COUNT(*)") == 0) {
-                   // The current user does not have the set
-                   hasSet = false;
-               }
-            System.out.println("checking before I add <3" + hasSet);
-               if (hasSet) {
-                if(loggedInUserUid.equals(setAuthor)){
-                String deleteQuery = "DELETE FROM Sets WHERE  sid = ?";
-                   insertStatement = connection.prepareStatement(deleteQuery);
-                   insertStatement.setString(1, searchKeywords);
-                   insertStatement.executeUpdate();
-                   hasSet = false;// Update hasSet to false since we removed the set.
-                }else{
-                     // The current user has the set, so we need to remove it.
-                   String deleteQuery = "DELETE FROM UserCreatesSets WHERE uid = ? AND sid = ?";
-                   insertStatement = connection.prepareStatement(deleteQuery);
-                   insertStatement.setString(1, loggedInUserUid);
-                   insertStatement.setString(2, searchKeywords);
-                   insertStatement.executeUpdate();
-                   hasSet = false;// Update hasSet to false since we removed the set.
-                }
-                  
+        if(cookie != null){
+            Connection connection = Utility.createSQLConnection();
+            Statement statement = connection.createStatement();
+            String query = "INSERT INTO UserCreatesSets (uid, sid) " + 
+            "VALUES ('" + cookie.getValue() + "', '" + sidValue + "');";
+            statement.executeUpdate(query);
+        }
+        System.out.println("Searched: " + setName);
+        if(cookie != null){
+            model.addAttribute("cookieName",cookie.getValue());
+        }
+        // Check if searchKeywords is null or empty, and provide a default value if necessary
+        String searchQuery = (setName != null && !setName.isEmpty()) ? setName : "Not specified";
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        ArrayList<Sets> searchResults = new ArrayList<>();
+         try {
 
-                
-                } else {
-                    // The current user does not have the set, so we need to add it.
-                    String insertQuery = "INSERT INTO UserCreatesSets (uid, sid) VALUES (?, ?)";
-                    insertStatement = connection.prepareStatement(insertQuery);
-                    insertStatement.setString(1, loggedInUserUid);
-                    insertStatement.setString(2, searchKeywords);
-                    insertStatement.executeUpdate();
-                    hasSet = true;// Update hasSet to true since we added the set.
+            // Establish a connection to the database
+            connection = Utility.createSQLConnection();
 
-                }
-                
-                //FINDing the tag name 
-                // Update hasSet in the model
+            // Prepare the SQL query to search for flashcard sets
+            String query = "SELECT * FROM Sets WHERE name LIKE ?";
+            statement = connection.prepareStatement(query);
 
+            // Set the searchKeywords as the parameter in the query
+            String searchString = "%" + setName + "%";
+            statement.setString(1, searchString);
+
+            // Execute the query and get the result set
+            resultSet = statement.executeQuery();
+             // Add the search query to the model as an attribute.
+            model.addAttribute("searched", searchQuery);
+            // Process the search results and add them to the searchResults ArrayList
+            while (resultSet.next()) {
+
+                    String sid = resultSet.getString("sid");
+                    String name = resultSet.getString("name");
+                    String author = resultSet.getString("author");
+                    Date date = resultSet.getDate("date");
+                    String description = resultSet.getString("description");
+
+                 //DELETE THIS so it works
+                    String tagquery = "SELECT t.tid, t.tag_name FROM Tag t " +
+                    "INNER JOIN SetHasTag st ON t.tid = st.tid " +
+                    "WHERE st.sid = ?";
+                    
+                    PreparedStatement tagstatement = connection.prepareStatement(tagquery);
+                    tagstatement.setString(1, sid);
+
+                    ResultSet tagResultSet = tagstatement.executeQuery();
+
+                    Sets sets = new Sets();
+
+                    if (tagResultSet.next()) {
+                        String tag = tagResultSet.getString("tag_name");
+                        System.out.println(tag);
+                    
+                        sets.setSetid(sid);
+                        sets.setName(name);
+                        sets.setAuthor(author);
+                        sets.setDate(date);
+                        sets.setDescription(description);
+                        sets.setTag(tag);
+                    } else {
+                        System.out.println("No tag found for sid: " + sid);
+                    }
+                    
+
+                    if (cookie != null) {
+                        boolean hasSet = true;
+                        PreparedStatement checkStatement = null;
+
+                        String loggedInUserUid = cookie.getValue();
+                        String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+                        checkStatement = connection.prepareStatement(checkQuery);
+                        //System.out.println("USER IDT?: " + loggedInUserUid);
+                        //System.out.println("SET ID?: " + sid);
+                        checkStatement.setString(1, loggedInUserUid);
+                        checkStatement.setString(2, sid);
+                        ResultSet result = checkStatement.executeQuery();
             
-                model.addAttribute("hasSet", hasSet);
-
-                System.out.println("Do they have set:" + hasSet);
-    
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                // Close the statements and connection
-                if (checkStatement != null) {
-                    checkStatement.close();
-                }
-                if (insertStatement != null) {
-                    insertStatement.close();
-                }
-                if (connection != null) {
-                    connection.close();
-                }
+                        if (result.next() && result.getInt("COUNT(*)") == 0) {
+                            // The current user does not have the set
+                            hasSet = false;
+                        }
+                        sets.setHasSet(hasSet);
+                        model.addAttribute("hasSet", hasSet);
+                    }
+                searchResults.add(sets);
+            }
+        model.addAttribute("flashcardSets", searchResults);
+        setSetList(searchResults);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the result set, statement, and connection
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
             }
         }
-
-        
-        // Run the searchSets method to display the search results with the updated hasSet status
-        System.out.println("SET TAG IS :       " + setTag);
-        return searchSets(setName, model, setTag, cookie);
+        return "searchflashcards";
         //"redirect:/quizMeDB/searchflashcards"
+    }
+
+    @PostMapping("/removeSet")
+    public String deleteSet(@RequestParam("searched") String sidValue, @RequestParam("setName") String setName, @RequestParam("setAuthor") String setAuthor,
+    Model model,  @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+        if(cookie != null){
+            Connection connection = Utility.createSQLConnection();
+            Statement statement = connection.createStatement();
+            String query = "DELETE FROM UserCreatesSets WHERE uid = '" + 
+            cookie.getValue() + "' AND sid = '" + sidValue + "';";
+            statement.executeUpdate(query);
+        }
+                System.out.println("Searched: " + setName);
+        if(cookie != null){
+            model.addAttribute("cookieName",cookie.getValue());
+        }
+        // Check if searchKeywords is null or empty, and provide a default value if necessary
+        String searchQuery = (setName != null && !setName.isEmpty()) ? setName : "Not specified";
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        ArrayList<Sets> searchResults = new ArrayList<>();
+         try {
+
+            // Establish a connection to the database
+            connection = Utility.createSQLConnection();
+
+            // Prepare the SQL query to search for flashcard sets
+            String query = "SELECT * FROM Sets WHERE name LIKE ?";
+            statement = connection.prepareStatement(query);
+
+            // Set the searchKeywords as the parameter in the query
+            String searchString = "%" + setName + "%";
+            statement.setString(1, searchString);
+
+            // Execute the query and get the result set
+            resultSet = statement.executeQuery();
+             // Add the search query to the model as an attribute.
+            model.addAttribute("searched", searchQuery);
+            // Process the search results and add them to the searchResults ArrayList
+            while (resultSet.next()) {
+
+                    String sid = resultSet.getString("sid");
+                    String name = resultSet.getString("name");
+                    String author = resultSet.getString("author");
+                    Date date = resultSet.getDate("date");
+                    String description = resultSet.getString("description");
+
+                 //DELETE THIS so it works
+                    String tagquery = "SELECT t.tid, t.tag_name FROM Tag t " +
+                    "INNER JOIN SetHasTag st ON t.tid = st.tid " +
+                    "WHERE st.sid = ?";
+                    
+                    PreparedStatement tagstatement = connection.prepareStatement(tagquery);
+                    tagstatement.setString(1, sid);
+
+                    ResultSet tagResultSet = tagstatement.executeQuery();
+
+                    Sets sets = new Sets();
+
+                    if (tagResultSet.next()) {
+                        String tag = tagResultSet.getString("tag_name");
+                        System.out.println(tag);
+                    
+                        sets.setSetid(sid);
+                        sets.setName(name);
+                        sets.setAuthor(author);
+                        sets.setDate(date);
+                        sets.setDescription(description);
+                        sets.setTag(tag);
+                    } else {
+                        System.out.println("No tag found for sid: " + sid);
+                    }
+                    
+
+                    if (cookie != null) {
+                        boolean hasSet = true;
+                        PreparedStatement checkStatement = null;
+
+                        String loggedInUserUid = cookie.getValue();
+                        String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+                        checkStatement = connection.prepareStatement(checkQuery);
+                        //System.out.println("USER IDT?: " + loggedInUserUid);
+                        //System.out.println("SET ID?: " + sid);
+                        checkStatement.setString(1, loggedInUserUid);
+                        checkStatement.setString(2, sid);
+                        ResultSet result = checkStatement.executeQuery();
+            
+                        if (result.next() && result.getInt("COUNT(*)") == 0) {
+                            // The current user does not have the set
+                            hasSet = false;
+                        }
+                        sets.setHasSet(hasSet);
+                        model.addAttribute("hasSet", hasSet);
+                    }
+                searchResults.add(sets);
+            }
+        model.addAttribute("flashcardSets", searchResults);
+        setSetList(searchResults);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the result set, statement, and connection
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        }
+        return "searchflashcards";
     }
     
             
