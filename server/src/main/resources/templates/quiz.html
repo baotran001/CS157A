@@ -16,17 +16,18 @@
                     alt="logo" style="width:340px;height:100px;">
             </picture>
             <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/quiz">
-                <div class="card" th:each="item, itemIndex : ${questionsList}">
-                    <h3>Question <span th:text="${itemIndex.index + 1}"></span></h3>
-                    <span><b>Term:</b> </span><span th:text="${item.getQuestion()}"></span><hr/>
-                    <span><b>Definition: </b> </span><span th:text="${item.getAnswer()}"></span>
-                    <select th:id="${itemIndex.index}" name="selectedAnswers" style="margin-top: 10px;">
-                        <option value="True">True</option>
-                        <option value="False">False</option>
-                    </select>
-                </div>
-                <input type="hidden" name="questionList" th:value="${questionsList}">
-                <button class="follow-button" type="submit">Submit</button>
+        <div class="card" th:each="item, itemIndex : ${questionsList}">
+            <h3>Question <span th:text="${itemIndex.index + 1}"></span></h3>
+            <span><b>Term:</b> </span><span th:text="${item.getQuestion()}"></span><hr/>
+            <span><b>Definition: </b> </span><span th:text="${item.getAnswer()}"></span>
+            <select th:id="${itemIndex.index}" name="selectedAnswers" style="margin-top: 10px;">
+                <option value="True">True</option>
+                <option value="False">False</option>
+            </select>
+        </div>
+        <input type="hidden" name="questionList" th:value="${questionsList}">
+        <button class="follow-button" type="submit">Submit</button>
+    </form>
 
     </center>
 
