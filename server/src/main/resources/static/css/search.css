@@ -1,6 +1,7 @@
 /* Add a style for the parent container that wraps both the button-box and the container */
 .parent-container {
     position: relative; /* Set the parent container to relative positioning */
+    margin-top: 10px; 
   }
   
  
@@ -16,7 +17,7 @@
     font-size: 150;
     
   }
- 
+
 
 .result-container {
     text-align: center;
