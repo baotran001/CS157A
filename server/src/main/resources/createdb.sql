@@ -119,14 +119,6 @@ CREATE TABLE ReviewsHasComments(
     FOREIGN KEY (rid) REFERENCES Reviews(rid) ON DELETE CASCADE
 );
 
-CREATE TABLE CommentsHasLikesList(
-    cid VARCHAR(15) NOT NULL, 
-    uid VARCHAR(15) NOT NULL, 
-    PRIMARY KEY (cid, uid),
-    FOREIGN KEY (cid) REFERENCES ReviewsHasComments(cid) ON DELETE CASCADE,
-    FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE
-);
-
 CREATE TABLE UserHasFollowingList(
     uid VARCHAR(15) NOT NULL, 
     fid VARCHAR(15) NOT NULL, 
