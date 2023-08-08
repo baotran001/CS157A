@@ -165,6 +165,9 @@ public class QuizRoutes {
             // Handle the case when the cookie is not present
             return "redirect:/quizMeDB/login"; // Redirect to the login page or an appropriate page
         }
+
+        model.addAttribute("cookieName",cookie.getValue());
+        
         model.addAttribute("totalScore", totalScore);
         model.addAttribute("totalQuestions", totalQuestions);
         model.addAttribute("percentageCorrect", percentageCorrect);

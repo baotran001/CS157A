@@ -9,7 +9,7 @@
 
 <body>
     <div th:replace="~{base :: header}"></div>
-    <div class="parent-container" th:fragment="content"> 
+    <div th:fragment="content"> 
         <center>
             <picture>
                 <img src="https://media.discordapp.net/attachments/1136904785694568530/1137548841906884688/Screenshot_2023-08-05_at_5.52.44_PM.png"
@@ -19,10 +19,10 @@
         </center>
         <div class="result-container">
             <!-- Display total score and total questions -->
-            <p class="result-text">You got <span th:text="${totalScore}"></span> out of <span th:text="${totalQuestions}"></span> correct</p>
+            <p>You got <span th:text="${totalScore}"></span> out of <span th:text="${totalQuestions}"></span> correct</p>
             
             <!-- Display percentage correct -->
-            <p class="percentage-text">Percentage Correct: <span th:text="${percentageCorrect}"></span>%</p>
+            <p >Percentage Correct: <span th:text="${percentageCorrect}"></span>%</p>
         </div>
 </body>
 
