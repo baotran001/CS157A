@@ -142,8 +142,10 @@ public class MyRoutes {
         Connection connection = Utility.createSQLConnection();
         try {
             Statement statement = connection.createStatement();
-            String query = "SELECT * FROM Sets WHERE author = '" + uid + "' AND sid NOT IN " +
-                       "(SELECT sid FROM FolderHasSets);";
+            String query = "SELECT * FROM Sets WHERE sid IN " +
+               "(SELECT sid FROM UserCreatesSets WHERE uid = '" + uid + "') " +
+               "AND sid NOT IN (SELECT sid FROM FolderHasSets);";
+
             ResultSet resultSet = statement.executeQuery(query);
     
             while (resultSet.next()) {
