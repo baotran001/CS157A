@@ -57,6 +57,10 @@ public class SetsRoutes {
     @GetMapping("/sets")
     public String displaySetsPage(@RequestParam(name = "fid", required = false) String fidValue,
                                 @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login";
+        }
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
