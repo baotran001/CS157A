@@ -17,7 +17,7 @@
             </picture>
         <div class="parent-container">
                 <div class="tab">
-                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/filterTag">
                         <input type="hidden" name="searched" th:value="${searched}">
                         <input type="hidden" name="setName" th:value="${searched}">
                         <input type="hidden" name="setTag" th:value="noValue">
@@ -33,7 +33,7 @@
                     </form>
                 </div>
                 <div class="tab">
-                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/filterTag">
                         <input type="hidden" name="searched" th:value="${searched}">
                         <input type="hidden" name="setName" th:value="${searched}">
                         <input type="hidden" name="setTag" th:value="English">
@@ -42,16 +42,17 @@
                     </form>
                 </div>
                 <div class="tab">
-                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/filterTag">
                         <input type="hidden" name="searched" th:value="${searched}">
                         <input type="hidden" name="setName" th:value="${searched}">
                         <input type="hidden" name="setTag" th:value="Math">
                         <input type="hidden" name="searchType" value="flashcardSets">
+                        <input type="hidden" name="setList" th:value="${flashcardSets}">
                         <button class="tabBox" type="submit">Math</button>
                     </form>
                 </div>
                 <div class="tab">
-                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/filterTag">
                         <input type="hidden" name="searched" th:value="${searched}">
                         <input type="hidden" name="setName" th:value="${searched}">
                         <input type="hidden" name="setTag" th:value="Science">
@@ -60,7 +61,7 @@
                     </form>
                 </div>
                 <div class="tab">
-                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/searchflashcards">
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/filterTag">
                         <input type="hidden" name="searched" th:value="${searched}">
                         <input type="hidden" name="setName" th:value="${searched}">
                         <input type="hidden" name="setTag" th:value="History">
@@ -83,17 +84,24 @@
                         <p>Date: <span th:text="${flashcardSet.date}"></span></p>
                         <p>Description: <span th:text="${flashcardSet.description}"></span></p>
                         <p>Tag: <span th:text="${flashcardSet.tag}"></span></p>
-                        <p>hasSet value: <span th:text="${hasSet}"></span></p>
+                        <p>hasSet value: <span th:text="${flashcardSet.hasSet}"></span></p>
                         <div>
-                            <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/addSet">
+                            <form th:if="${flashcardSet.hasSet == false}" class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/addSet">
                                 <input type="hidden" name="searched" th:value="${flashcardSet.sid}">
                                 <input type="hidden" name="setName" th:value="${searched}">
                                 <input type="hidden" name="setAuthor" th:value="${flashcardSet.author}">
                                 <input type="hidden" name="setTag" th:value="${setTag}">
                                 <input type="hidden" name="searchType" value="set">
-                                <button class="follow-button" type="submit" th:text="${hasSet ? 'Remove Set' : 'Add Set'}"></button>
+                                <button class="follow-button" type="submit" >Add Set</button>
                             </form>
-                            
+                            <form th:if="${flashcardSet.hasSet == true}" class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/removeSet">
+                                <input type="hidden" name="searched" th:value="${flashcardSet.sid}">
+                                <input type="hidden" name="setName" th:value="${searched}">
+                                <input type="hidden" name="setAuthor" th:value="${flashcardSet.author}">
+                                <input type="hidden" name="setTag" th:value="${setTag}">
+                                <input type="hidden" name="searchType" value="set">
+                                <button class="follow-button" type="submit" >Remove Set</button>
+                            </form>
                             
                         </div>
                     </div>
