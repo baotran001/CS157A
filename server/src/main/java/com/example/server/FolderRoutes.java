@@ -46,12 +46,14 @@ public class FolderRoutes {
         model.addAttribute("dataList", folderArr);
         return "createfolder";
     }
-    @PostMapping("/creatingFolder")
+    @PostMapping("/createFolder")
     public String createFolder(@ModelAttribute("folder") Folder folder, RedirectAttributes redirectAttributes,
                              @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException{
         
         String uid = cookie.getValue();
         folder.setAuthor(uid); // Set the user's uid as the author
+
+        System.out.println("yo");
         
         String fid = folder.getFid();
         String name = folder.getName();

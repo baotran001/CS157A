@@ -1,5 +1,8 @@
 package com.example.server;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -88,7 +92,7 @@ public class MyRoutes {
                 Cookie cookie = new Cookie("user_uid", username);
                 cookie.setMaxAge(3600); // Set the cookie's expiration time in seconds (1 hour in this example)
                 response.addCookie(cookie);
-                return "redirect:/quizMeDB/home?uid=" + username;
+                return "redirect:/quizMeDB/home";
             }
              connection.close();
          }catch (SQLException E){
@@ -101,17 +105,159 @@ public class MyRoutes {
         return "redirect:/quizMeDB/login";
     }
 
-
+    private List<Folder> getUserFoldersFromDatabase(String uid) throws SQLException {
+        List<Folder> userFolders = new ArrayList<>();
+    
+        // Establish a SQL connection and execute a query to retrieve user's folders
+        Connection connection = Utility.createSQLConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "SELECT * FROM Folder WHERE author = '" + uid + "';";
+            ResultSet resultSet = statement.executeQuery(query);
+    
+            while (resultSet.next()) {
+                // Create a new Folder object and populate its fields from the resultSet
+                Folder folder = new Folder();
+                folder.setFolderid(resultSet.getString("fid"));
+                folder.setName(resultSet.getString("name"));
+                folder.setAuthor(resultSet.getString("author"));
+                folder.setDescription(resultSet.getString("description"));
+                userFolders.add(folder);
+            }
+    
+            connection.close();
+        } catch (SQLException e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        }
+    
+        return userFolders;
+    }
+    
+    //get user's sets without a folder
+    private List<Sets> getUserSetsWithoutFolder(String uid) throws SQLException {
+        List<Sets> userSetsWithoutFolder = new ArrayList<>();
+    
+        // Establish a SQL connection and execute a query to retrieve user's sets without a folder
+        Connection connection = Utility.createSQLConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "SELECT * FROM Sets WHERE author = '" + uid + "' AND sid NOT IN " +
+                       "(SELECT sid FROM FolderHasSets);";
+            ResultSet resultSet = statement.executeQuery(query);
+    
+            while (resultSet.next()) {
+                // Create a new Set object and populate its fields from the resultSet
+                Sets set = new Sets();
+                set.setSetid(resultSet.getString("sid"));
+                set.setName(resultSet.getString("name"));
+                set.setAuthor(resultSet.getString("author"));
+                set.setDescription(resultSet.getString("description"));
+                userSetsWithoutFolder.add(set);
+            }
+    
+            connection.close();
+        } catch (SQLException e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        }
+    
+        return userSetsWithoutFolder;
+    }
 
     @GetMapping("/home")
     public String showHome(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model){
         // Assign cookieName as name of user
-        if(cookie != null){
-            model.addAttribute("cookieName",cookie.getValue());
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login"; // Redirect to the login page or an appropriate page
+        }
+        
+        model.addAttribute("cookieName",cookie.getValue());
+
+        try {
+            // Retrieve user's folders from the database (replace this with actual code)
+            List<Folder> userFolders = getUserFoldersFromDatabase(cookie.getValue()); // You need to implement this method
+    
+            model.addAttribute("userFolders", userFolders);
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception, you can log or show an error message
         }
 
+        try {
+            // Retrieve user's folders from the database (replace this with actual code)
+            List<Folder> userFolders = getUserFoldersFromDatabase(cookie.getValue()); // You need to implement this method
+
+            // Retrieve user's sets without a folder from the database (replace this with actual code)
+            List<Sets> userSetsWithoutFolder = getUserSetsWithoutFolder(cookie.getValue()); // You need to implement this method
+
+            model.addAttribute("userFolders", userFolders);
+            model.addAttribute("userSetsWithoutFolder", userSetsWithoutFolder);
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception, you can log or show an error message
+        }
         
         return "home";
+    }
+
+    private List<Sets> getSetsInFolder(String fid) throws SQLException {
+        List<Sets> folderSets = new ArrayList<>();
+    
+        // Establish a SQL connection and execute a query to retrieve sets within the folder
+        Connection connection = Utility.createSQLConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "SELECT * FROM FolderHasSets fhs " +
+                           "JOIN Sets s ON fhs.sid = s.sid " +
+                           "WHERE fhs.fid = '" + fid + "';";
+            ResultSet resultSet = statement.executeQuery(query);
+    
+            while (resultSet.next()) {
+                // Create a new Sets object and populate its fields from the resultSet
+                Sets set = new Sets();
+                set.setSetid(resultSet.getString("s.sid"));
+                set.setName(resultSet.getString("s.name"));
+                set.setAuthor(resultSet.getString("s.author"));
+                set.setDate(resultSet.getDate("s.date"));
+                set.setDescription(resultSet.getString("s.description"));
+                folderSets.add(set);
+            }
+    
+            connection.close();
+        } catch (SQLException e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        }
+    
+        return folderSets;
+    }
+
+    //showing folder
+    @GetMapping("/folder")
+    public String showFolder(@RequestParam(name = "fid") String fid,
+                            @RequestParam(name = "name") String name,
+                            @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) {
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login"; // Redirect to the login page or an appropriate page
+        }
+
+        model.addAttribute("cookieName",cookie.getValue());
+        
+        // Add folder info to the model
+        model.addAttribute("folderId", fid);
+        model.addAttribute("folderName", name);
+
+        try {
+            // Retrieve sets within the specified folder from the database
+            List<Sets> folderSets = getSetsInFolder(fid); // You need to implement this method
+            model.addAttribute("folderSets", folderSets);
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception, you can log or show an error message
+        }
+        
+
+        return "folder"; // Return the name of the HTML template for the folder page
     }
 
     @GetMapping("/logout")

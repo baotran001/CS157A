@@ -32,8 +32,11 @@ public class SearchRoutes {
         return "searchflashcards";
     }
     @PostMapping("/searchflashcards")
-    public String searchSets(@RequestParam("searched") String searchKeywords , Model model,
+    public String searchSets(@RequestParam("searched") String searchKeywords , Model model, @RequestParam("setTag") String setTag,
                             @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+       
+        System.out.println("Searched: " + searchKeywords);
+         System.out.println("Ssearxhed TAG: " + setTag);
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
@@ -63,44 +66,135 @@ public class SearchRoutes {
             // Process the search results and add them to the searchResults ArrayList
             while (resultSet.next()) {
 
-                
-                
-                String sid = resultSet.getString("sid");
-                String name = resultSet.getString("name");
-                String author = resultSet.getString("author");
-                Date date = resultSet.getDate("date");
-                String description = resultSet.getString("description");
+                //IF THERE IS NOT SET TAG
+                if(setTag.equals("noValue")){
+                    String sid = resultSet.getString("sid");
+                    String name = resultSet.getString("name");
+                    String author = resultSet.getString("author");
+                    Date date = resultSet.getDate("date");
+                    String description = resultSet.getString("description");
 
-                Sets sets = new Sets();
-                sets.setSetid(sid);
-                sets.setName(name);
-                sets.setAuthor(author);
-                sets.setDate(date);
-                sets.setDescription(description);
+                 //DELETE THIS so it works
+                    String tagquery = "SELECT t.tid, t.tag_name FROM Tag t " +
+                    "INNER JOIN SetHasTag st ON t.tid = st.tid " +
+                    "WHERE st.sid = ?";
+                    
+                    PreparedStatement tagstatement = connection.prepareStatement(tagquery);
+                    tagstatement.setString(1, sid);
 
-                searchResults.add(sets);
-                model.addAttribute("flashcardSets", searchResults);
+                    ResultSet tagResultSet = tagstatement.executeQuery();
 
-                 if (cookie != null) {
-                    boolean hasSet = true;
-                    PreparedStatement checkStatement = null;
-                    String loggedInUserUid = cookie.getValue();
-                    String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
-                    checkStatement = connection.prepareStatement(checkQuery);
-                    System.out.println("USER IDT?: " + loggedInUserUid);
-                    System.out.println("SET ID?: " + sid);
-                    checkStatement.setString(1, loggedInUserUid);
-                    checkStatement.setString(2, sid);
-                    ResultSet result = checkStatement.executeQuery();
-        
-                    if (result.next() && result.getInt("COUNT(*)") == 0) {
-                        // The current user does not have the set
-                        hasSet = false;
+                    Sets sets = new Sets();
+
+                    if (tagResultSet.next()) {
+                        String tag = tagResultSet.getString("tag_name");
+                        System.out.println(tag);
+                    
+                        sets.setSetid(sid);
+                        sets.setName(name);
+                        sets.setAuthor(author);
+                        sets.setDate(date);
+                        sets.setDescription(description);
+                        sets.setTag(tag);
+                    } else {
+                        System.out.println("No tag found for sid: " + sid);
                     }
+                    
+                    
 
-                    System.out.println("GOT SET?: " + hasSet);
-                    model.addAttribute("hasSet", hasSet);
+                    searchResults.add(sets);
+                    model.addAttribute("flashcardSets", searchResults);
+
+                    if (cookie != null) {
+                    boolean hasSet = true;
+                        PreparedStatement checkStatement = null;
+                        String loggedInUserUid = cookie.getValue();
+                        String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+                        checkStatement = connection.prepareStatement(checkQuery);
+                        //System.out.println("USER IDT?: " + loggedInUserUid);
+                        //System.out.println("SET ID?: " + sid);
+                        checkStatement.setString(1, loggedInUserUid);
+                        checkStatement.setString(2, sid);
+                        ResultSet result = checkStatement.executeQuery();
+            
+                        if (result.next() && result.getInt("COUNT(*)") == 0) {
+                            // The current user does not have the set
+                            hasSet = false;
+                        }
+
+                        System.out.println("GOT SET?: " + hasSet);
+                        model.addAttribute("hasSet", hasSet);
+                    }
+                }else{
+                    if (setTag != null && !setTag.isEmpty()) {
+                        //System.out.println("Set Tag is:" + setTag);
+                        String sid = resultSet.getString("sid");
+                        PreparedStatement tagStatement = null;
+                        String tagQuery = "SELECT tid FROM Tag WHERE tag_name = ?";
+                        tagStatement = connection.prepareStatement(tagQuery);
+                        tagStatement.setString(1, setTag);
+                        ResultSet tagResultSet = tagStatement.executeQuery();
+        
+                        if (tagResultSet.next()) {
+                            //System.out.println("THERE ARE TAGS" + setTag);
+                            String tid = tagResultSet.getString("tid");
+                            String setTagQuery = "SELECT sid FROM SetHasTag WHERE tid = ? AND sid = ?";
+                            PreparedStatement setTagStatement = connection.prepareStatement(setTagQuery);
+                            setTagStatement.setString(1, tid);
+                            setTagStatement.setString(2, sid);
+                            ResultSet setTagResultSet = setTagStatement.executeQuery();
+        
+                            if (setTagResultSet.next()) {
+                                Sets taggedSet = new Sets();
+                                taggedSet.setSetid(sid);
+                                System.out.println("THIS IS SID: " + sid);
+                                // Fetch other details of the set if needed
+
+                                String name = resultSet.getString("name");
+                                System.out.println("THIS IS NAME: " + name);
+                                String author = resultSet.getString("author");
+                                Date date = resultSet.getDate("date");
+                                String description = resultSet.getString("description");
+
+
+                                
+
+                                Sets sets = new Sets();
+                                sets.setSetid(sid);
+                                sets.setName(name);
+                                sets.setAuthor(author);
+                                sets.setDate(date);
+                                sets.setDescription(description);
+
+                                searchResults.add(sets);
+                                model.addAttribute("flashcardSets", searchResults);
+
+                                 if (cookie != null) {
+                                    boolean hasSet = true;
+                                        PreparedStatement checkStatement = null;
+                                        String loggedInUserUid = cookie.getValue();
+                                        String checkQuery = "SELECT COUNT(*) FROM UserCreatesSets WHERE uid = ? AND sid = ?";
+                                        checkStatement = connection.prepareStatement(checkQuery);
+                                        //System.out.println("USER IDT?: " + loggedInUserUid);
+                                        //System.out.println("SET ID?: " + sid);
+                                        checkStatement.setString(1, loggedInUserUid);
+                                        checkStatement.setString(2, sid);
+                                        ResultSet result = checkStatement.executeQuery();
+                            
+                                        if (result.next() && result.getInt("COUNT(*)") == 0) {
+                                            // The current user does not have the set
+                                            hasSet = false;
+                                        }
+
+                                        System.out.println("GOT SET?: " + hasSet);
+                                        model.addAttribute("hasSet", hasSet);
+                                 }
+                            }
+                        }
+                    }
+                
                 }
+                
             }
 
             
@@ -123,13 +217,15 @@ public class SearchRoutes {
     }
 
     @PostMapping("/addSet")
-    public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName,
+    public String addSet(@RequestParam("searched") String searchKeywords, @RequestParam("setName") String setName, @RequestParam("setAuthor") String setAuthor,
     Model model,  @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
+        String setTag = "noValue";
         if (cookie != null) {
             String loggedInUserUid = cookie.getValue();
             Connection connection = null;
             PreparedStatement checkStatement = null;
             PreparedStatement insertStatement = null;
+        
             try {
                 // Establish a connection to the database
                 connection = Utility.createSQLConnection();
@@ -148,15 +244,24 @@ public class SearchRoutes {
                }
             System.out.println("checking before I add <3" + hasSet);
                if (hasSet) {
-                   // The current user has the set, so we need to remove it.
+                if(loggedInUserUid.equals(setAuthor)){
+                String deleteQuery = "DELETE FROM Sets WHERE  sid = ?";
+                   insertStatement = connection.prepareStatement(deleteQuery);
+                   insertStatement.setString(1, searchKeywords);
+                   insertStatement.executeUpdate();
+                   hasSet = false;// Update hasSet to false since we removed the set.
+                }else{
+                     // The current user has the set, so we need to remove it.
                    String deleteQuery = "DELETE FROM UserCreatesSets WHERE uid = ? AND sid = ?";
                    insertStatement = connection.prepareStatement(deleteQuery);
                    insertStatement.setString(1, loggedInUserUid);
                    insertStatement.setString(2, searchKeywords);
                    insertStatement.executeUpdate();
                    hasSet = false;// Update hasSet to false since we removed the set.
+                }
+                  
 
-                     System.out.println("INSIDE SeT remove");
+                
                 } else {
                     // The current user does not have the set, so we need to add it.
                     String insertQuery = "INSERT INTO UserCreatesSets (uid, sid) VALUES (?, ?)";
@@ -166,10 +271,12 @@ public class SearchRoutes {
                     insertStatement.executeUpdate();
                     hasSet = true;// Update hasSet to true since we added the set.
 
-                    System.out.println("INSIDE SeT INSERT");
                 }
-    
+                
+                //FINDing the tag name 
                 // Update hasSet in the model
+
+            
                 model.addAttribute("hasSet", hasSet);
 
                 System.out.println("Do they have set:" + hasSet);
@@ -189,10 +296,11 @@ public class SearchRoutes {
                 }
             }
         }
-      
-    
+
+        
         // Run the searchSets method to display the search results with the updated hasSet status
-        return searchSets(setName, model, cookie);
+        System.out.println("SET TAG IS :       " + setTag);
+        return searchSets(setName, model, setTag, cookie);
         //"redirect:/quizMeDB/searchflashcards"
     }
     
