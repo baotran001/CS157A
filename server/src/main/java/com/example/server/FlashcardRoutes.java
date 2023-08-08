@@ -132,8 +132,16 @@ public class FlashcardRoutes {
         String sidValue = getSid();
         String flashid = flashcard.getFlashid();
         String favorite = flashcard.getFavorite();
-        String front = flashcard.getFront();
-        String back = flashcard.getBack();
+        String front = flashcard.getFront().trim();
+        String back = flashcard.getBack().trim();
+
+
+        // Check if flashcard front and back are not empty or just spaces
+        if (front.isEmpty() || back.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Flashcard front and back cannot be empty or contain only spaces.");
+            return "redirect:/quizMeDB/flashcard?sid=" + sidValue + "&name=" + getSetName();
+        }
+
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
         String query = "SELECT COUNT(*) FROM FrontHasBack WHERE front = '" + front + "';";
@@ -168,7 +176,13 @@ public class FlashcardRoutes {
         int star = review.getStar();
         String author = cookie.getValue();
         java.sql.Date date = review.getDate();
-        String text = review.getText();
+        String text = review.getText().trim();
+
+        //check if review text is not empty or just spaces
+        if (text.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Review text cannot be empty or contain only spaces.");
+            return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
+        }
 
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
@@ -196,7 +210,14 @@ public class FlashcardRoutes {
         String cid = comment.getCid();
         String author = cookie.getValue();
         java.sql.Date date = comment.getDate();
-        String text = comment.getText();
+        String text = comment.getText().trim();
+
+        // Check if comment text is not empty or just spaces
+        if (text.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Comment text cannot be empty or contain only spaces.");
+            return "redirect:/quizMeDB/flashcard?sid=" + getSid() + "&name=" + getSetName();
+        }
+
 
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
