@@ -53,13 +53,11 @@ public class FolderRoutes {
         String uid = cookie.getValue();
         folder.setAuthor(uid); // Set the user's uid as the author
 
-        System.out.println("yo");
         
         String fid = folder.getFid();
         String name = folder.getName().trim();
         String author = folder.getAuthor();
         String description = folder.getDescription().trim();
-        //System.out.println(sid + " " + author + " " + name + " " + description + " " + date);
         
         // Check if folder name and description are not empty or just spaces
         if (name.isEmpty() || description.isEmpty()) {

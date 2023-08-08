@@ -61,8 +61,6 @@ public class SetsRoutes {
             model.addAttribute("cookieName",cookie.getValue());
         }
 
-        System.out.println("sets fid: " + fidValue);
-
         model.addAttribute("fName", getFolderName());
         model.addAttribute("fidVal", fidValue);
     
@@ -78,15 +76,12 @@ public class SetsRoutes {
             tag.setTag_name(resTags.getString("tag_name"));
             tags.add(tag);
 
-            //System.out.println("Number of tags0: " + tags.size());
         }
-        //System.out.println("Number of tags: " + tags.size());
         
         tagConnection.close();
 
         model.addAttribute("tags", tags);
         
-        //System.out.println("Number of tags2: " + tags.size());
 
         model.addAttribute("sets", new Sets());
         Connection connection = Utility.createSQLConnection();
@@ -124,15 +119,11 @@ public class SetsRoutes {
         
         String fidValue = set.getFid();
 
-        System.out.println("fid: " + fidValue);
-        System.out.println("fid2: " + fid);
-
         String sid = set.getSid();
         String name = set.getName().trim();
         String author = set.getAuthor();
         java.sql.Date date = set.getDate();
         String description = set.getDescription().trim();
-        //System.out.println(sid + " " + author + " " + name + " " + description + " " + date);
         
         // Check if set name and description are not empty or just spaces
         if (name.isEmpty() || description.isEmpty()) {
@@ -155,9 +146,7 @@ public class SetsRoutes {
         if (rs.next()) {
             count = rs.getInt("Count(*)");
         }
-        //System.out.println(count);
         if (count == 0){
-            //System.out.println(sid);
 
             //insert into sets
             String query1 = "INSERT INTO sets (sid, name, author, date, description) " + "VALUES ('" 
@@ -168,8 +157,6 @@ public class SetsRoutes {
             String query2 = "INSERT INTO UserCreatesSets (uid, sid) " + "VALUES ('" 
             + uid + "', '" + sid + "');";
             statement.executeUpdate(query2);
-
-            System.out.println("tag: " + tag);
 
             // Insert into the set has tag table using the sid and tid
             String query4 = "INSERT INTO SetHasTag (sid, tid) " + "VALUES ('" 

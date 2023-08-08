@@ -150,7 +150,6 @@ public class FlashcardRoutes {
         if (rs.next()) {
             count = rs.getInt("Count(*)");
         }
-        System.out.println(count);
         if (count == 0){
             String query1 = "INSERT INTO FrontHasBack (front, back) " + "VALUES ('" 
             + front + "', '" + back  + "');";

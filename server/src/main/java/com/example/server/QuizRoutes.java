@@ -64,8 +64,6 @@ public class QuizRoutes {
                                 RedirectAttributes redirectAttributes,
                                 @CookieValue(name = "user_uid", required = false) Cookie cookie,  Model model) throws SQLException {
 
-        System.out.println("QuestionList " + questionList);
-        System.out.println("Selected Answers " + selectedAnswers);
 
         //------Creates Two ArrayList
         ArrayList<String> questions = new ArrayList<>();
@@ -79,8 +77,6 @@ public class QuizRoutes {
             answers.add(matcher.group(2));
         }
 
-        System.out.println("Questions: " + questions);
-        System.out.println("Answers: " + answers);
 
 
         //-------Creates the selected answer arrayList
@@ -90,7 +86,6 @@ public class QuizRoutes {
         ArrayList<String> userAnswerArrayList = new ArrayList<>(userAnswer);
 
         // Print the ArrayList
-        System.out.println("The user answers: " + userAnswerArrayList);
 
 
         //Check if questions matches answers
@@ -109,9 +104,7 @@ public class QuizRoutes {
                     boolean isMatch = false;
                     while (resultSet.next()) {
                         String dbAnswer = resultSet.getString("back");
-                        System.out.println("Answers: " + dbAnswer);
                         if (dbAnswer.equals(answer)) {
-                            System.out.println("In true : " + answer);
                             matches.add("True");
                             isMatch = true;
                             break;
@@ -126,7 +119,6 @@ public class QuizRoutes {
             }
         }
 
-        System.out.println("Matches array: " + matches);
 
 
         if (userAnswer.size() != matches.size()) {
@@ -143,9 +135,6 @@ public class QuizRoutes {
         int totalQuestions = userAnswer.size();
         double percentageCorrect = ((double) totalScore / totalQuestions) * 100;
         
-        System.out.println("Total Score: " + totalScore);
-        System.out.println("Total Questions: " + totalQuestions);
-        System.out.println("Percentage Correct: " + percentageCorrect + "%");
 
 
        
