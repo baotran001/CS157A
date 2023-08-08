@@ -16,6 +16,9 @@
                 <div th:if="${success}">
                     <p th:text="${success}"></p>
                 </div>
+                <div th:if="${error}" role="alert">
+                    <p th:text="${error}"></p>
+                </div>
                 <div class="container">
                     <label><b>Create Folder Name</b></label>
                     <input type="text" placeholder="Enter Folder Name" th:field="*{name}" required>

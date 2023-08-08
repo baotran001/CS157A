@@ -56,6 +56,9 @@
             <div th:if="${errorMessage}">
                 <p th:text="${errorMessage}"></p>
             </div>
+            <div th:if="${error}" role="alert">
+                <p th:text="${error}"></p>
+            </div>
             <div class="container">
     
               <label><b>Add a Term(Question or Vocabulary)</b></label>
@@ -118,6 +121,9 @@
             </div>
             <div th:if="${errorMessage}">
                 <p th:text="${errorMessage}"></p>
+            </div>
+            <div th:if="${error}"role="alert">
+                <p th:text="${error}"></p>
             </div>
             <div class="container">
 
