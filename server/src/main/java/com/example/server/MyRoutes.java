@@ -33,7 +33,6 @@ public class MyRoutes {
         // Get User parameters
         String username = user.getUsername().trim();
         String password = user.getPassword();
-        //System.out.println(uid + " " + email + " " + password);
 
         // Check if username or password is empty after trimming
         if (username.isEmpty() || password.isEmpty()) {
@@ -58,7 +57,6 @@ public class MyRoutes {
              // no duplicate, add user into database
              String query = "INSERT INTO USERS (uid, password) " + "VALUES ('" 
              + username + "', '" + password + "');";
-             //System.out.println(query);
              // use executeUpdate for insert statements
              statement.executeUpdate(query);
              connection.close();

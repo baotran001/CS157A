@@ -17,7 +17,11 @@
                 <img src="https://media.discordapp.net/attachments/1136904785694568530/1137548841906884688/Screenshot_2023-08-05_at_5.52.44_PM.png"
                     alt="logo" style="width:340px;height:100px;">
             </picture>
-            <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/quiz">
+            <form style="
+                display: flex;
+                flex-direction: column;
+            "
+            class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/quiz">
                 <div class="card" th:each="item, itemIndex : ${questionsList}">
                     <h3>Question <span th:text="${itemIndex.index + 1}"></span></h3>
                     <span><b>Term:</b> </span><span th:text="${item.getQuestion()}"></span>

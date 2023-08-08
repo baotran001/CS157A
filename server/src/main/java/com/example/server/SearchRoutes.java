@@ -227,7 +227,6 @@ public class SearchRoutes {
         if (cookie != null) {
             model.addAttribute("cookieName", cookie.getValue());
         }
-        System.out.println(searchKeywords);
         // Check if searchKeywords is null or empty, and provide a default value if necessary
         String searchQuery = (searchKeywords != null && !searchKeywords.isEmpty()) ? searchKeywords : "Not specified";
         Connection connection = null;
@@ -290,7 +289,6 @@ public class SearchRoutes {
             // Add the user search results and the isFollowing flag to the model
             model.addAttribute("users", searchResults);
             model.addAttribute("searched", searchQuery);
-            System.out.println("isfollowing in search:" + isFollowing);
             model.addAttribute("isFollowing", isFollowing);
             boolean noUsersFound = searchResults.isEmpty();
             model.addAttribute("noUsersFound", noUsersFound);
@@ -316,8 +314,6 @@ public class SearchRoutes {
                          @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException {
         if (cookie != null) {
             String loggedInUserUid = cookie.getValue(); // Get the UID of the logged-in user from the cookie.
-            //System.out.println("Search user method called with searchKeywords: " + searchKeywords);
-            //System.out.println("loggedInUserUid: " + loggedInUserUid);
             if (searchKeywords != null && !searchKeywords.isEmpty() && !searchKeywords.equals(loggedInUserUid)) {
                 Connection connection = null;
                 PreparedStatement checkStatement = null;
@@ -349,7 +345,6 @@ public class SearchRoutes {
                     }
     
                     if (isFollowing) {
-                        //System.out.println("UnFollow method called!");
                         // The current user is following the searched user, so we need to unfollow them.
                         String unfollowQuery = "DELETE FROM UserHasFollowingList WHERE uid = ? AND fid = ?";
                         unfollowStatement = connection.prepareStatement(unfollowQuery);
@@ -366,7 +361,6 @@ public class SearchRoutes {
                         // Update isFollowing to false since we just unfollowed the user
                         isFollowing = false;
                     } else {
-                        //System.out.println("Follow method called!");
                         // The current user is not following the searched user, so we need to follow them.
                         String followQuery = "INSERT INTO UserHasFollowingList (uid, fid) VALUES (?, ?)";
                         followStatement = connection.prepareStatement(followQuery);
@@ -386,7 +380,6 @@ public class SearchRoutes {
     
                     // Update isFollowing in the model
                     model.addAttribute("isFollowing", isFollowing);
-                    //System.out.println("Is following: " + isFollowing);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 } finally {
