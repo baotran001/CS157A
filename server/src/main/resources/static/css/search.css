@@ -19,11 +19,18 @@
   }
  
 
-
-
-
-
-
+.result-container {
+    text-align: center;
+    margin-top: 500px;
+}
+.result-text {
+    font-size: 100px;
+    margin-bottom: 10px;
+}
+.percentage-text {
+    font-size: 100px;
+    color: #333;
+}
 
 .tab{
     display: inline-block; 
