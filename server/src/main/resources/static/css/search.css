@@ -1,7 +1,6 @@
 /* Add a style for the parent container that wraps both the button-box and the container */
 .parent-container {
     position: relative; /* Set the parent container to relative positioning */
-    margin-top: 100px; /* Adjust the margin-top to move the container down */
   }
   
  
@@ -50,7 +49,6 @@
   .results-container {
     border: 4px solid  #07754d;
     padding: 10px;
-    margin-bottom: 10px;
     border-radius: 5px;
 
   }
@@ -60,4 +58,14 @@
     background-color: #D5F2E3;
     margin-bottom: 10px;
   }
+
+  .centered-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; /* Ensure the form takes at least the full viewport height */
+}
+
+
   
