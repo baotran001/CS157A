@@ -51,6 +51,10 @@ public class SearchRoutes {
     @GetMapping("/searchflashcards")
     public String displaySetsPage(   
     @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login";
+        }
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }

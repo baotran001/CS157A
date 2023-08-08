@@ -21,6 +21,10 @@ import jakarta.servlet.http.HttpServletResponse;
 public class FolderRoutes {
     @GetMapping("/createFolder")
     public String displayfolderPage(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login";
+        }
         if(cookie != null){
             model.addAttribute("cookieName",cookie.getValue());
         }
@@ -58,7 +62,6 @@ public class FolderRoutes {
         String name = folder.getName().trim();
         String author = folder.getAuthor();
         String description = folder.getDescription().trim();
-        
         // Check if folder name and description are not empty or just spaces
         if (name.isEmpty() || description.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Folder name and description cannot be empty or contain only spaces.");

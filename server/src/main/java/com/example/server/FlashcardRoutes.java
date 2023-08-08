@@ -49,6 +49,10 @@ public class FlashcardRoutes {
     @GetMapping("/flashcard")
     public String displayFlashcardsPage(@RequestParam("sid") String sidValue, 
     @RequestParam("name") String setName, RedirectAttributes redirectAttributes, @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login";
+        }
         if(cookie != null){
             // retrieve username, setname
             model.addAttribute("cookieName",cookie.getValue());
