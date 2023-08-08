@@ -43,9 +43,6 @@
                             <!-- Display the details of each user -->
                             <p class="result-name" th:text="'Name: ' + ${user.key}"></p>
                             <p th:text="'Following count: ' + ${user.value}"></p>
-                            <p>Tags:
-                                <span th:each="tag : ${tagsBySid[flashcardSet.setid]}" th:text="${tag}"></span>
-                            </p>
                             <!-- follow button -->
                             <div th:if="${!searched.equals(cookieName) && cookieName != null}">
                                 <form class="form-inline my-2 my-lg-0" method="POST" action="/quizMeDB/follow">
