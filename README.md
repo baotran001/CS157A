@@ -3,9 +3,9 @@
 ### QuizMe
 
 ## Team Members:
-Hai Ly
-Isabel Luong
-Baotran Nguyen
+* Hai Ly
+* Isabel Luong
+* Baotran Nguyen
 
 ## Set Up & Compiling
 To run this project, Visual Studio Code (VSCode) and MySQL must be installed.
