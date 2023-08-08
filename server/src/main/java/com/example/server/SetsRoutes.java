@@ -128,12 +128,23 @@ public class SetsRoutes {
         System.out.println("fid2: " + fid);
 
         String sid = set.getSid();
-        String name = set.getName();
+        String name = set.getName().trim();
         String author = set.getAuthor();
         java.sql.Date date = set.getDate();
-        String description = set.getDescription();
+        String description = set.getDescription().trim();
         //System.out.println(sid + " " + author + " " + name + " " + description + " " + date);
         
+        // Check if set name and description are not empty or just spaces
+        if (name.isEmpty() || description.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Set name and description cannot be empty or contain only spaces.");
+            
+            if(fidValue != null){
+                return "redirect:/quizMeDB/sets?fid=" + fidValue;
+            }
+            
+            return "redirect:/quizMeDB/sets";
+        }
+
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
         String query = "Select Count(*) FROM Sets WHERE name = '" + name +

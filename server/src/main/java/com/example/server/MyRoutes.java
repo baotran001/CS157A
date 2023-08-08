@@ -200,18 +200,33 @@ public class MyRoutes {
         return "home";
     }
 
-    private List<Sets> getSetsInFolder(String fid) throws SQLException {
+    //showing folder
+    @GetMapping("/folder")
+    public String showFolder(@RequestParam(name = "fid") String fid,
+                            @RequestParam(name = "name") String name,
+                            @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException {
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login"; // Redirect to the login page or an appropriate page
+        }
+
+        model.addAttribute("cookieName",cookie.getValue());
+        
+        // Add folder info to the model
+        model.addAttribute("folderId", fid);
+        model.addAttribute("folderName", name);
+
         List<Sets> folderSets = new ArrayList<>();
-    
-        // Establish a SQL connection and execute a query to retrieve sets within the folder
         Connection connection = Utility.createSQLConnection();
+
         try {
+            // Retrieve sets within the specified folder from the database
+
             Statement statement = connection.createStatement();
             String query = "SELECT * FROM FolderHasSets fhs " +
                            "JOIN Sets s ON fhs.sid = s.sid " +
                            "WHERE fhs.fid = '" + fid + "';";
             ResultSet resultSet = statement.executeQuery(query);
-    
             while (resultSet.next()) {
                 // Create a new Sets object and populate its fields from the resultSet
                 Sets set = new Sets();
@@ -224,33 +239,7 @@ public class MyRoutes {
             }
     
             connection.close();
-        } catch (SQLException e) {
-            // Handle any exceptions
-            e.printStackTrace();
-        }
-    
-        return folderSets;
-    }
 
-    //showing folder
-    @GetMapping("/folder")
-    public String showFolder(@RequestParam(name = "fid") String fid,
-                            @RequestParam(name = "name") String name,
-                            @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) {
-        if (cookie == null) {
-            // Handle the case when the cookie is not present
-            return "redirect:/quizMeDB/login"; // Redirect to the login page or an appropriate page
-        }
-
-        model.addAttribute("cookieName",cookie.getValue());
-        
-        // Add folder info to the model
-        model.addAttribute("folderId", fid);
-        model.addAttribute("folderName", name);
-
-        try {
-            // Retrieve sets within the specified folder from the database
-            List<Sets> folderSets = getSetsInFolder(fid); // You need to implement this method
             model.addAttribute("folderSets", folderSets);
         } catch (SQLException e) {
             e.printStackTrace(); // Handle the exception, you can log or show an error message
