@@ -56,11 +56,17 @@ public class FolderRoutes {
         System.out.println("yo");
         
         String fid = folder.getFid();
-        String name = folder.getName();
+        String name = folder.getName().trim();
         String author = folder.getAuthor();
-        String description = folder.getDescription();
+        String description = folder.getDescription().trim();
         //System.out.println(sid + " " + author + " " + name + " " + description + " " + date);
         
+        // Check if folder name and description are not empty or just spaces
+        if (name.isEmpty() || description.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Folder name and description cannot be empty or contain only spaces.");
+            return "redirect:/quizMeDB/createFolder";
+        }
+
         Connection connection = Utility.createSQLConnection();
         Statement statement = connection.createStatement();
         String query1 = "INSERT INTO folder (fid, name, author, description) " + "VALUES ('" 

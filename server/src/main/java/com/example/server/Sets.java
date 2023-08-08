@@ -13,10 +13,19 @@ public class Sets {
     private String description;
     private String fid;
     private String tag;
+    private Boolean hasSet;
 
     public Sets(){
         this.sid = Utility.generateRandomId(15);
         this.date = java.sql.Date.valueOf(LocalDate.now());
+    }
+
+    public void setHasSet(boolean x){
+        this.hasSet = x;
+    }
+
+    public Boolean getHasSet(){
+        return this.hasSet;
     }
 
     public String getFid(){
