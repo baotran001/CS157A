@@ -2,7 +2,6 @@ package com.example.server;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -103,6 +102,7 @@ public class MyRoutes {
         return "redirect:/quizMeDB/login";
     }
 
+    //helper method for home
     private List<Folder> getUserFoldersFromDatabase(String uid) throws SQLException {
         List<Folder> userFolders = new ArrayList<>();
     
@@ -132,7 +132,7 @@ public class MyRoutes {
         return userFolders;
     }
     
-    //get user's sets without a folder
+    //get user's sets without a folder, helper method for home
     private List<Sets> getUserSetsWithoutFolder(String uid) throws SQLException {
         List<Sets> userSetsWithoutFolder = new ArrayList<>();
     
@@ -176,8 +176,8 @@ public class MyRoutes {
         model.addAttribute("cookieName",cookie.getValue());
 
         try {
-            // Retrieve user's folders from the database (replace this with actual code)
-            List<Folder> userFolders = getUserFoldersFromDatabase(cookie.getValue()); // You need to implement this method
+            // Retrieve user's folders from the database
+            List<Folder> userFolders = getUserFoldersFromDatabase(cookie.getValue()); 
     
             model.addAttribute("userFolders", userFolders);
         } catch (SQLException e) {
@@ -185,11 +185,11 @@ public class MyRoutes {
         }
 
         try {
-            // Retrieve user's folders from the database (replace this with actual code)
-            List<Folder> userFolders = getUserFoldersFromDatabase(cookie.getValue()); // You need to implement this method
+            // Retrieve user's folders from the database
+            List<Folder> userFolders = getUserFoldersFromDatabase(cookie.getValue()); 
 
-            // Retrieve user's sets without a folder from the database (replace this with actual code)
-            List<Sets> userSetsWithoutFolder = getUserSetsWithoutFolder(cookie.getValue()); // You need to implement this method
+            // Retrieve user's sets without a folder from the database
+            List<Sets> userSetsWithoutFolder = getUserSetsWithoutFolder(cookie.getValue()); 
 
             model.addAttribute("userFolders", userFolders);
             model.addAttribute("userSetsWithoutFolder", userSetsWithoutFolder);
