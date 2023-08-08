@@ -1,7 +1,7 @@
 /* Add a style for the parent container that wraps both the button-box and the container */
 .parent-container {
     position: relative; /* Set the parent container to relative positioning */
-    margin-top: 10px; /* Adjust the margin-top to move the container down */
+    margin-top: 10px; 
   }
   
  
@@ -17,6 +17,20 @@
     font-size: 150;
     
   }
+
+
+.result-container {
+    text-align: center;
+    margin-top: 500px;
+}
+.result-text {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+.percentage-text {
+    font-size: 30px;
+    color: #333;
+}
 
 .tab{
     display: inline-block; 
@@ -36,7 +50,6 @@
   .results-container {
     border: 4px solid  #07754d;
     padding: 10px;
-    margin-bottom: 10px;
     border-radius: 5px;
 
   }
@@ -46,4 +59,14 @@
     background-color: #D5F2E3;
     margin-bottom: 10px;
   }
+
+  .centered-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; /* Ensure the form takes at least the full viewport height */
+}
+
+
   

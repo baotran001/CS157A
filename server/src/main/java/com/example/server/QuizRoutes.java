@@ -1,6 +1,9 @@
 package com.example.server;
 import java.sql.*;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 import javax.naming.spi.DirStateFactory.Result;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
@@ -55,9 +58,119 @@ public class QuizRoutes {
         return "quiz";
     }
     @PostMapping("/quiz")
-    public String quizQuestions(@ModelAttribute("folder") Folder folder, RedirectAttributes redirectAttributes,
-                             @CookieValue(name = "user_uid", required = false) Cookie cookie) throws SQLException{
+    public String quizQuestions(@RequestParam("questionList") String questionList,
+                                @RequestParam("selectedAnswers") String selectedAnswers,
+                                @ModelAttribute("folder") Folder folder,
+                                RedirectAttributes redirectAttributes,
+                                @CookieValue(name = "user_uid", required = false) Cookie cookie,  Model model) throws SQLException {
+
+        System.out.println("QuestionList " + questionList);
+        System.out.println("Selected Answers " + selectedAnswers);
+
+        //------Creates Two ArrayList
+        ArrayList<String> questions = new ArrayList<>();
+        ArrayList<String> answers = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile("question='(.*?)', answer='(.*?)'");
+        Matcher matcher = pattern.matcher(questionList);
+
+        while (matcher.find()) {
+            questions.add(matcher.group(1));
+            answers.add(matcher.group(2));
+        }
+
+        System.out.println("Questions: " + questions);
+        System.out.println("Answers: " + answers);
+
+
+        //-------Creates the selected answer arrayList
+        List<String> userAnswer = Arrays.asList(selectedAnswers.split(","));
+
+        // If you need an ArrayList specifically
+        ArrayList<String> userAnswerArrayList = new ArrayList<>(userAnswer);
+
+        // Print the ArrayList
+        System.out.println("The user answers: " + userAnswerArrayList);
+
+
+        //Check if questions matches answers
+        ArrayList<String> matches = new ArrayList<>();
+
+        Connection connection = Utility.createSQLConnection();
+        String query = "SELECT back FROM FrontHasBack WHERE front = ?";
         
-        return "redirect:/quizMeDB/results";
+        for (int i = 0; i < questions.size(); i++) {
+            String question = questions.get(i);
+            String answer = answers.get(i);
+
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, question);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    boolean isMatch = false;
+                    while (resultSet.next()) {
+                        String dbAnswer = resultSet.getString("back");
+                        System.out.println("Answers: " + dbAnswer);
+                        if (dbAnswer.equals(answer)) {
+                            System.out.println("In true : " + answer);
+                            matches.add("True");
+                            isMatch = true;
+                            break;
+                        }
+                    }
+                    if (!isMatch) {
+                        matches.add("False");
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("Matches array: " + matches);
+
+
+        if (userAnswer.size() != matches.size()) {
+            throw new IllegalArgumentException("ArrayLists must have the same size");
+        }
+        
+        int totalScore = 0;
+        for (int i = 0; i < userAnswer.size(); i++) {
+            if (userAnswer.get(i).equals(matches.get(i))) {
+                totalScore++;
+            }
+        }
+        
+        int totalQuestions = userAnswer.size();
+        double percentageCorrect = ((double) totalScore / totalQuestions) * 100;
+        
+        System.out.println("Total Score: " + totalScore);
+        System.out.println("Total Questions: " + totalQuestions);
+        System.out.println("Percentage Correct: " + percentageCorrect + "%");
+
+
+       
+
+        return results(totalScore, totalQuestions, percentageCorrect, folder,  redirectAttributes, cookie, model);
+    }
+
+     @GetMapping("/result")
+     public String results(@RequestParam("totalScore") int totalScore,
+                                @RequestParam("totalQuestions")int totalQuestions,
+                                @RequestParam("percentageCorrect") Double percentageCorrect,
+                                @ModelAttribute("folder") Folder folder,
+                                RedirectAttributes redirectAttributes,
+                                @CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException {
+                                     
+         if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login"; // Redirect to the login page or an appropriate page
+        }
+
+        model.addAttribute("cookieName",cookie.getValue());
+        
+        model.addAttribute("totalScore", totalScore);
+        model.addAttribute("totalQuestions", totalQuestions);
+        model.addAttribute("percentageCorrect", percentageCorrect);
+        return "result";
     }
 }
