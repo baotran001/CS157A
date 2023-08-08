@@ -4,6 +4,7 @@ public class User {
     // User Schema
     private String username;
     private String password;
+    private String following;
 
     public User(){
     }
@@ -19,5 +20,11 @@ public class User {
     }
     public void setPassword(String pass){
         this.password = pass;
+    }
+    public String getFollowing(){
+        return this.following;
+    }
+    public void setFollowing(String following){
+        this.following = following;
     }
 }

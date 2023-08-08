@@ -181,7 +181,7 @@ public class MyRoutes {
     
             model.addAttribute("userFolders", userFolders);
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle the exception, you can log or show an error message
+            e.printStackTrace(); // Handle the exception
         }
 
         try {
@@ -194,7 +194,7 @@ public class MyRoutes {
             model.addAttribute("userFolders", userFolders);
             model.addAttribute("userSetsWithoutFolder", userSetsWithoutFolder);
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle the exception, you can log or show an error message
+            e.printStackTrace(); // Handle the exception
         }
         
         return "home";
@@ -217,11 +217,10 @@ public class MyRoutes {
         model.addAttribute("folderName", name);
 
         List<Sets> folderSets = new ArrayList<>();
-        Connection connection = Utility.createSQLConnection();
 
         try {
             // Retrieve sets within the specified folder from the database
-
+            Connection connection = Utility.createSQLConnection();
             Statement statement = connection.createStatement();
             String query = "SELECT * FROM FolderHasSets fhs " +
                            "JOIN Sets s ON fhs.sid = s.sid " +
@@ -242,11 +241,52 @@ public class MyRoutes {
 
             model.addAttribute("folderSets", folderSets);
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle the exception, you can log or show an error message
+            e.printStackTrace(); // Handle the exception
         }
         
 
-        return "folder"; // Return the name of the HTML template for the folder page
+        return "folder"; 
+    }
+
+    @GetMapping("/following")
+    public String showFollowing(@CookieValue(name = "user_uid", required = false) Cookie cookie, Model model) throws SQLException{
+        // Assign cookieName as name of user
+        if (cookie == null) {
+            // Handle the case when the cookie is not present
+            return "redirect:/quizMeDB/login"; // Redirect to the login page or an appropriate page
+        }
+        
+        String uid = cookie.getValue();
+        model.addAttribute("cookieName",uid);
+
+        List<User> userList = new ArrayList<>();
+
+        try {
+            Connection connection = Utility.createSQLConnection();
+            // Retrieve user's following from the database
+            Statement statement = connection.createStatement();
+            String query = "SELECT F.uid AS following_uid, U.uid AS follower_uid " +
+                "FROM UserHasFollowingList F " +
+                "JOIN Users U ON F.uid = U.uid " +
+                "WHERE F.fid = '" + uid + "';";
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                // Create a new Sets object and populate its fields from the resultSet
+                User user = new User();
+                user.setUsername(resultSet.getString("follower_uid"));
+                user.setFollowing(resultSet.getString("following_uid"));
+                userList.add(user);
+            }
+    
+            connection.close();
+
+            model.addAttribute("userList", userList);
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception
+        }
+        
+        return "following";
     }
 
     @GetMapping("/logout")
