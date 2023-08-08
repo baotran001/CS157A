@@ -227,7 +227,7 @@ public class SearchRoutes {
         if (cookie != null) {
             model.addAttribute("cookieName", cookie.getValue());
         }
-    
+        System.out.println(searchKeywords);
         // Check if searchKeywords is null or empty, and provide a default value if necessary
         String searchQuery = (searchKeywords != null && !searchKeywords.isEmpty()) ? searchKeywords : "Not specified";
         Connection connection = null;
