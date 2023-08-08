@@ -84,8 +84,7 @@ public class QuizRoutes {
 
 
         //-------Creates the selected answer arrayList
-        String input = "True,True,True,True"; // Your comma-separated string
-        List<String> userAnswer = Arrays.asList(input.split(","));
+        List<String> userAnswer = Arrays.asList(selectedAnswers.split(","));
 
         // If you need an ArrayList specifically
         ArrayList<String> userAnswerArrayList = new ArrayList<>(userAnswer);
