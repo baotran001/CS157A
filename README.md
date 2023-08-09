@@ -44,7 +44,12 @@ Once the file is open, run it. Wait for about 10 seconds for SpringBoot to finis
 
 http://localhost:8080/quizMeDB/login
 
-Congrats! You have finished setting up the application. To quit, simply close the application and stop running the Java file.
+Congrats! You have finished setting up the application. You can start using the application by creating an account with the "Register" button. Or, you can use an existing account! Here's one to use:
+
+Username: hi
+Password: hi
+
+To quit, simply close the application and stop running the Java file.
 
 ## Divison of Work
 ### Code:
