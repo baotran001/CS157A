@@ -72,6 +72,7 @@ Isabel Luong
 * Tags (front & backend)
 * View Following (front & backend)
 * Creating & dropping database
+* Sample data
 
 Baotran Nguyen
 * Navbar (attempted to debug)
